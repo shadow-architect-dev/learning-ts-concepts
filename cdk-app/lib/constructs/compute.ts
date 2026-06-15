@@ -54,6 +54,8 @@ export class ComputeConstruct extends Construct {
       assignPublicIp: false,
       securityGroups: [sg],
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      circuitBreaker: { rollback: true },
+      minHealthyPercent: 100,
     });
 
     if (props.dbSecurityGroup) {
