@@ -3,7 +3,6 @@ import { Construct } from "constructs";
 import { VpcConstruct } from "./constructs/network";
 import { DatabaseConstruct } from "./constructs/database";
 import { ComputeConstruct } from "./constructs/compute";
-import { ApplicationConstruct } from "./constructs/application";
 
 export interface ThreeTierStackProps extends cdk.StackProps {
   /** EC2 instance size or similar identifier used by the application layer */
