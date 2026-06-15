@@ -2,7 +2,6 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 
 const rds = cdk.aws_rds;
-const ec2 = cdk.aws_ec2;
 const secrets = cdk.aws_secretsmanager;
 
 export interface DatabaseConstructProps {
