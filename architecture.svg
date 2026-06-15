@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="480" viewBox="0 0 900 480">
+  <style>
+    .box { fill:#f6f9ff; stroke:#2b6cb0; stroke-width:2; rx:8; }
+    .title { font: 600 16px sans-serif; fill:#1a202c; }
+    .label { font: 400 13px sans-serif; fill:#2d3748; }
+    .arrow { stroke:#2d3748; stroke-width:2; fill:none; marker-end:url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2d3748" />
+    </marker>
+  </defs>
+
+  <!-- Internet -->
+  <rect x="40" y="40" width="160" height="60" class="box" />
+  <text x="120" y="70" text-anchor="middle" class="title">Internet</text>
+
+  <!-- ALB -->
+  <rect x="240" y="30" width="160" height="80" class="box" />
+  <text x="320" y="60" text-anchor="middle" class="title">ALB</text>
+  <text x="320" y="78" text-anchor="middle" class="label">(Listener / Target Group)</text>
+
+  <!-- ECS -->
+  <rect x="460" y="20" width="360" height="160" class="box" />
+  <text x="640" y="45" text-anchor="middle" class="title">ECS (Fargate)</text>
+  <text x="640" y="68" text-anchor="middle" class="label">Service / Task / Container</text>
+
+  <!-- Aurora -->
+  <rect x="460" y="220" width="360" height="160" class="box" />
+  <text x="640" y="245" text-anchor="middle" class="title">Amazon Aurora (Serverless v2)</text>
+  <text x="640" y="267" text-anchor="middle" class="label">Cluster (private subnets)</text>
+
+  <!-- VPC surrounding label -->
+  <rect x="440" y="8" width="400" height="392" fill="none" stroke="#718096" stroke-dasharray="6,6" rx="10" />
+  <text x="640" y="16" text-anchor="middle" class="label">VPC (public / private subnets)</text>
+
+  <!-- Arrows -->
+  <path d="M200 70 L240 70" class="arrow" />
+  <path d="M400 70 L460 70" class="arrow" />
+  <path d="M640 180 L640 220" class="arrow" />
+
+  <!-- Security group note -->
+  <rect x="40" y="360" width="260" height="100" class="box" />
+  <text x="170" y="390" class="title">Security Groups</text>
+  <text x="170" y="412" class="label">- ALB -> ECS (HTTP)</text>
+  <text x="170" y="432" class="label">- ECS -> Aurora (3306)</text>
+
+  <!-- Footer -->
+  <text x="20" y="470" class="label">Generated: 2026-06-15</text>
+</svg>
