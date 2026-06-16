@@ -16,6 +16,7 @@ for (const e of envs) {
       region: process.env.CDK_DEFAULT_REGION,
     },
     stackName: `ThreeTierStack-${e.name}`,
+    terminationProtection: e.name !== "dev",
     instanceSize: e.instanceSize,
     dbCapacity: e.dbCapacity,
     envName: e.name,
