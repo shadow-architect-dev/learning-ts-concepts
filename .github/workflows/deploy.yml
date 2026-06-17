@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - 'release/*'
 
 permissions:
   id-token: write # OIDC認証を使用するために必須
@@ -32,6 +33,11 @@ jobs:
             echo "AWS_ROLE_ARN=arn:aws:iam::$AWS_ACCOUNT_ID:role/github-actions-deploy-role-prod" >> $GITHUB_ENV
             echo "ECR_REPO=app-repo-prod" >> $GITHUB_ENV
             echo "CDK_STACK=ThreeTierStack-prod" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" =~ ^release/ ]]; then
+            echo "ENV_NAME=stg" >> $GITHUB_ENV
+            echo "AWS_ROLE_ARN=arn:aws:iam::$AWS_ACCOUNT_ID:role/github-actions-deploy-role-stg" >> $GITHUB_ENV
+            echo "ECR_REPO=app-repo-stg" >> $GITHUB_ENV
+            echo "CDK_STACK=ThreeTierStack-stg" >> $GITHUB_ENV
           else
             echo "ENV_NAME=dev" >> $GITHUB_ENV
             # 開発ブランチ(developなど)はdev環境スタックへデプロイします

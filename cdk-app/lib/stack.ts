@@ -51,9 +51,14 @@ export class ThreeTierStack extends cdk.Stack {
       dbSecretArn: db.secret?.secretArn,
     });
 
-    // GitHub Actions用 IAM ロールの作成（本番環境用と開発環境用でブランチを分離）
-    // 開発/ステージング環境は develop ブランチ、本番環境は main ブランチからのデプロイのみを許可
-    const allowedBranch = envName === "prod" ? "main" : "develop";
+    // GitHub Actions用 IAM ロールの作成（環境ごとにブランチを分離して最小権限を適用）
+    // dev環境は develop ブランチ、stg環境は release/* ブランチ、prod環境は main ブランチからのデプロイのみを許可
+    let allowedBranch = "develop";
+    if (envName === "prod") {
+      allowedBranch = "main";
+    } else if (envName === "stg") {
+      allowedBranch = "release/*";
+    }
 
     new GithubActionsRoleConstruct(this, "GithubActionsRole", {
       envName: envName ?? "dev",

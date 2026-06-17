@@ -74,6 +74,8 @@ AWSアカウント内に GitHub 用の OIDC プロバイダーが未登録の場
 cd cdk-app
 # 開発環境 (developブランチ用) の構築
 npx cdk deploy ThreeTierStack-dev --require-approval never
+# ステージング環境 (release/*ブランチ用) の構築
+npx cdk deploy ThreeTierStack-stg --require-approval never
 # 本番環境 (mainブランチ用) の構築
 npx cdk deploy ThreeTierStack-prod --require-approval never
 ```
@@ -82,6 +84,8 @@ npx cdk deploy ThreeTierStack-prod --require-approval never
 ### 4. 自動デプロイの実行
 以降は、対象ブランチへのプッシュで自動デプロイが起動します。
 - `develop` ブランチへのプッシュ: 開発環境 (`ThreeTierStack-dev`) へデプロイ
+- `release/*` ブランチへのプッシュ: ステージング環境 (`ThreeTierStack-stg`) へデプロイ
 - `main` ブランチへのプッシュ: 本番環境 (`ThreeTierStack-prod`) へデプロイ
 
 CI/CD実行時にビルドされたアプリケーションイメージが ECR にプッシュされ、CDK のデプロイにおいて `imageTag` コンテキスト引数（コミットSHA）が渡され、ECSサービスが更新されます。
+
