@@ -11,7 +11,7 @@
 
 ## アーキテクチャ図
 
-![Architecture](architecture.svg)
+![Architecture](architecture.svg?v=2)
 
 ## 主要ファイル
 
