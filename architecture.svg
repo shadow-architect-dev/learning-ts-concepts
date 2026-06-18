@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="680" viewBox="0 0 1120 680">
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="780" viewBox="0 0 1120 780">
   <defs>
     <!-- Background grid -->
     <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -62,8 +62,8 @@
 
   <g class="font-all">
     <!-- Header -->
-    <text x="40" y="45" class="title-main">Secure 3-AZ 3-Tier Web Architecture</text>
-    <text x="40" y="65" class="title-sub">AWS CDK Stack: ThreeTierStack (WAF + CloudFront + ALB + Fargate + Aurora v2)</text>
+    <text x="40" y="45" class="title-main">Secure 3-AZ 3-Tier Web Architecture with RDS Proxy</text>
+    <text x="40" y="65" class="title-sub">AWS CDK Stack: ThreeTierStack (WAF + CloudFront + ALB + Fargate + RDS Proxy + Aurora v2)</text>
 
     <!-- Legend (Top Right) -->
     <g transform="translate(770, 20)">
@@ -100,7 +100,7 @@
     <g transform="translate(180, 250)" filter="url(#shadow)">
       <rect width="125" height="90" class="card" style="stroke: #8b5cf6; stroke-width: 1.5;" />
       <circle cx="62" cy="40" r="16" fill="#8b5cf6" opacity="0.2" />
-      <!-- CF Symbol (globe with lock/speed arrows) -->
+      <!-- fill CF Symbol -->
       <circle cx="62" cy="40" r="10" fill="none" stroke="#8b5cf6" stroke-width="1.5" />
       <path d="M 52 40 L 72 40 M 62 30 A 15 10 0 0 0 62 50" fill="none" stroke="#8b5cf6" stroke-width="1" />
       <text x="62" y="75" text-anchor="middle" font-size="11" font-weight="700" fill="#5b21b6">CloudFront CDN</text>
@@ -109,7 +109,7 @@
 
     <!-- ==================== REGIONAL VPC ==================== -->
     <g transform="translate(340, 80)">
-      <rect width="750" height="560" class="vpc-box" />
+      <rect width="750" height="660" class="vpc-box" />
       <text x="20" y="28" class="vpc-label">VPC (10.0.0.0/16)</text>
       
       <!-- Internet Gateway on VPC Border -->
@@ -120,8 +120,8 @@
       </g>
 
       <!-- AZ Columns Boundaries (Dashed Lines) -->
-      <line x1="245" y1="45" x2="245" y2="540" class="az-line" />
-      <line x1="495" y1="45" x2="495" y2="540" class="az-line" />
+      <line x1="245" y1="45" x2="245" y2="640" class="az-line" />
+      <line x1="495" y1="45" x2="495" y2="640" class="az-line" />
 
       <!-- AZ Labels -->
       <text x="132" y="40" text-anchor="middle" class="az-label">Availability Zone A</text>
@@ -138,7 +138,7 @@
         <g transform="translate(15, 35)" filter="url(#shadow)">
           <rect width="190" height="75" class="card" />
           <circle cx="28" cy="38" r="14" fill="#f59e0b" opacity="0.2" />
-          <path d="M 22 38 L 34 38 M 28 32 L 28 44 M 24 34 L 32 42" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" />
+          <path d="M 22 38 L 34 38 M 28 32 L 28 44 M 24 34 L 32 42" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" fill="none" />
           <text x="52" y="36" class="card-title">NAT Gateway</text>
           <text x="52" y="52" class="card-subtitle">nat-gateway-a</text>
           <text x="52" y="64" font-size="9" fill="#94a3b8">Outbound Traffic</text>
@@ -151,7 +151,6 @@
         <text x="10" y="18" class="subnet-title pub">Public Subnet B</text>
 
         <!-- ALB + WAF WebACL Protected Group -->
-        <!-- WAF Shield -->
         <g transform="translate(15, 30)" filter="url(#shadow)">
           <rect width="200" height="85" class="card" style="stroke: #ef4444; stroke-width: 1.5;" />
           <!-- WAF Shield Icon -->
@@ -237,11 +236,21 @@
       <!-- ==================== SUBNET LAYER 3: ISOLATED ==================== -->
       <!-- Subnet A - Isolated -->
       <g transform="translate(15, 385)">
-        <rect width="220" height="150" class="subnet-isolated" />
+        <rect width="220" height="240" class="subnet-isolated" />
         <text x="10" y="18" class="subnet-title iso">Isolated Subnet A</text>
 
+        <!-- RDS Proxy A (prod/stg only) -->
+        <g transform="translate(15, 30)" filter="url(#shadow)">
+          <rect width="190" height="75" class="card" style="stroke: #3b82f6; stroke-width: 1.5; stroke-dasharray: 3 3;" />
+          <circle cx="28" cy="38" r="14" fill="#3b82f6" opacity="0.15" />
+          <path d="M 22 38 L 34 38 M 28 32 L 34 38 L 28 44" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" fill="none" />
+          <text x="52" y="32" class="card-title" fill="#1d4ed8">RDS Proxy</text>
+          <text x="52" y="46" class="card-subtitle">prod/stg only</text>
+          <text x="52" y="58" class="card-subtitle" fill="#64748b">dev bypasses to DB</text>
+        </g>
+
         <!-- Aurora Writer -->
-        <g transform="translate(15, 35)" filter="url(#shadow)">
+        <g transform="translate(15, 130)" filter="url(#shadow)">
           <rect width="190" height="95" class="card" style="stroke: #10b981; stroke-width: 1.5;" />
           <circle cx="28" cy="48" r="14" fill="#10b981" opacity="0.2" />
           <path d="M 20 40 C 20 37, 36 37, 36 40 L 36 56 C 36 59, 20 59, 20 56 Z M 20 45 C 20 48, 36 48, 36 45 M 20 50 C 20 53, 36 53, 36 50" stroke="#10b981" stroke-width="2" stroke-linecap="round" fill="none" />
@@ -254,11 +263,21 @@
 
       <!-- Subnet B - Isolated -->
       <g transform="translate(250, 385)">
-        <rect width="230" height="150" class="subnet-isolated" />
+        <rect width="230" height="240" class="subnet-isolated" />
         <text x="10" y="18" class="subnet-title iso">Isolated Subnet B</text>
 
+        <!-- RDS Proxy B (prod/stg only) -->
+        <g transform="translate(15, 30)" filter="url(#shadow)">
+          <rect width="200" height="75" class="card" style="stroke: #3b82f6; stroke-width: 1.5; stroke-dasharray: 3 3;" />
+          <circle cx="28" cy="38" r="14" fill="#3b82f6" opacity="0.15" />
+          <path d="M 22 38 L 34 38 M 28 32 L 34 38 L 28 44" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" fill="none" />
+          <text x="52" y="32" class="card-title" fill="#1d4ed8">RDS Proxy</text>
+          <text x="52" y="46" class="card-subtitle">prod/stg only</text>
+          <text x="52" y="58" class="card-subtitle" fill="#64748b">dev bypasses to DB</text>
+        </g>
+
         <!-- Aurora Reader -->
-        <g transform="translate(15, 35)" filter="url(#shadow)">
+        <g transform="translate(15, 130)" filter="url(#shadow)">
           <rect width="200" height="95" class="card" />
           <circle cx="28" cy="48" r="14" fill="#10b981" opacity="0.2" />
           <path d="M 20 40 C 20 37, 36 37, 36 40 L 36 56 C 36 59, 20 59, 20 56 Z M 20 45 C 20 48, 36 48, 36 45 M 20 50 C 20 53, 36 53, 36 50" stroke="#10b981" stroke-width="2" stroke-linecap="round" fill="none" />
@@ -271,11 +290,21 @@
 
       <!-- Subnet C - Isolated -->
       <g transform="translate(495, 385)">
-        <rect width="240" height="150" class="subnet-isolated" />
+        <rect width="240" height="240" class="subnet-isolated" />
         <text x="10" y="18" class="subnet-title iso">Isolated Subnet C</text>
 
+        <!-- RDS Proxy C (prod/stg only) -->
+        <g transform="translate(20, 30)" filter="url(#shadow)">
+          <rect width="200" height="75" class="card" style="stroke: #3b82f6; stroke-width: 1.5; stroke-dasharray: 3 3;" />
+          <circle cx="28" cy="38" r="14" fill="#3b82f6" opacity="0.15" />
+          <path d="M 22 38 L 34 38 M 28 32 L 34 38 L 28 44" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" fill="none" />
+          <text x="52" y="32" class="card-title" fill="#1d4ed8">RDS Proxy</text>
+          <text x="52" y="46" class="card-subtitle">prod/stg only</text>
+          <text x="52" y="58" class="card-subtitle" fill="#64748b">dev bypasses to DB</text>
+        </g>
+
         <!-- Aurora Reader -->
-        <g transform="translate(20, 35)" filter="url(#shadow)">
+        <g transform="translate(20, 130)" filter="url(#shadow)">
           <rect width="200" height="95" class="card" />
           <circle cx="28" cy="48" r="14" fill="#10b981" opacity="0.2" />
           <path d="M 20 40 C 20 37, 36 37, 36 40 L 36 56 C 36 59, 20 59, 20 56 Z M 20 45 C 20 48, 36 48, 36 45 M 20 50 C 20 53, 36 53, 36 50" stroke="#10b981" stroke-width="2" stroke-linecap="round" fill="none" />
@@ -302,7 +331,6 @@
     </g>
 
     <!-- 3. CloudFront to ALB (via IGW) -->
-    <!-- CloudFront right side center (x=305, y=295) -> IGW (x=322, y=252) -> ALB (x=605, y=142) -->
     <path d="M 305 295 L 322 295 L 322 252" class="flow-line-blue" />
     <path d="M 322 252 L 400 252 L 590 252 Q 605 252 605 235 L 605 155" class="flow-line-blue" marker-end="url(#arrow-blue)" />
     
@@ -314,11 +342,6 @@
     <text x="420" y="230" font-size="9" font-weight="700" fill="#1d4ed8">4. Forward Request</text>
 
     <!-- 4. ALB to ECS Tasks -->
-    <!-- ALB center bottom: x=605+100=705, y=140+30+85 = 255. No, in B context: x=340+250+15+200/2 = 705. y = 80+60+30+85 = 255 -->
-    <!-- Split lines from ALB to Tasks A, B, C -->
-    <!-- Task A center top: x=340+15+15+190/2 = 465, y=80+215+35 = 330 -->
-    <!-- Task B center top: x=340+250+15+200/2 = 705, y=330 -->
-    <!-- Task C center top: x=340+495+20+200/2 = 955, y=330 -->
     <path d="M 705 225 L 705 285" class="flow-line-blue" />
     <path d="M 705 285 L 465 285 L 465 322" class="flow-line-blue" marker-end="url(#arrow-blue)" />
     <path d="M 705 285 L 705 322" class="flow-line-blue" marker-end="url(#arrow-blue)" />
@@ -331,37 +354,46 @@
     </g>
     <text x="775" y="268" font-size="9" font-weight="700" fill="#1d4ed8">5. Route Traffic</text>
 
-    <!-- 5. ECS Tasks to Aurora DB (Primary Writer & Readers via Connections API) -->
-    <!-- Task A bottom: x=465, y=80+215+35+110 = 440 -->
-    <!-- Task B bottom: x=705, y=440 -->
-    <!-- Task C bottom: x=955, y=440 -->
-    <!-- Writer top: x=465, y=80+385+35 = 500 -->
-    <!-- Reader B top: x=705, y=500 -->
-    <!-- Reader C top: x=955, y=500 -->
-    <path d="M 465 440 L 465 492" class="flow-line-green" marker-end="url(#arrow-green)" />
-    <path d="M 705 440 L 705 492" class="flow-line-green" marker-end="url(#arrow-green)" />
-    <path d="M 955 440 L 955 492" class="flow-line-green" marker-end="url(#arrow-green)" />
-    
-    <!-- Replication link between Writer and Readers -->
-    <path d="M 560 547 L 610 547" class="flow-line-dash" marker-end="url(#arrow)" />
-    <path d="M 830 547 L 880 547" class="flow-line-dash" marker-end="url(#arrow)" />
-    <text x="585" y="540" text-anchor="middle" font-size="8" fill="#64748b" font-weight="600">Replicate</text>
-    <text x="855" y="540" text-anchor="middle" font-size="8" fill="#64748b" font-weight="600">Replicate</text>
+    <!-- 5. ECS Tasks to RDS Proxy (prod/stg) -->
+    <!-- Task A bottom: x=465, y=440. Proxy A top: y=495 -->
+    <!-- Task B bottom: x=705, y=440. Proxy B top: y=495 -->
+    <!-- Task C bottom: x=955, y=440. Proxy C top: y=495 -->
+    <path d="M 465 440 L 465 487" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+    <path d="M 705 440 L 705 487" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+    <path d="M 955 440 L 955 487" class="flow-line-blue" marker-end="url(#arrow-blue)" />
 
-    <!-- Port 3306 Badge on ECS -> RDS line -->
-    <g transform="translate(475, 450)">
+    <!-- ECS Tasks to DB Directly (dev bypass) -->
+    <!-- Points left of task to left of database (y=440 to 587) -->
+    <path d="M 450 440 L 450 587" class="flow-line-dash" marker-end="url(#arrow)" />
+    <path d="M 690 440 L 690 587" class="flow-line-dash" marker-end="url(#arrow)" />
+    <path d="M 940 440 L 940 587" class="flow-line-dash" marker-end="url(#arrow)" />
+    <text x="382" y="520" font-size="8" fill="#64748b" font-weight="600">dev bypass</text>
+
+    <!-- 6. RDS Proxy to Aurora DB -->
+    <!-- Proxy A bottom: y=570. DB A top: y=595 -->
+    <path d="M 465 570 L 465 587" class="flow-line-green" marker-end="url(#arrow-green)" />
+    <path d="M 705 570 L 705 587" class="flow-line-green" marker-end="url(#arrow-green)" />
+    <path d="M 955 570 L 955 587" class="flow-line-green" marker-end="url(#arrow-green)" />
+
+    <!-- Replication link between Writer and Readers -->
+    <path d="M 560 642 L 610 642" class="flow-line-dash" marker-end="url(#arrow)" />
+    <path d="M 830 642 L 880 642" class="flow-line-dash" marker-end="url(#arrow)" />
+    <text x="585" y="635" text-anchor="middle" font-size="8" fill="#64748b" font-weight="600">Replicate</text>
+    <text x="855" y="635" text-anchor="middle" font-size="8" fill="#64748b" font-weight="600">Replicate</text>
+
+    <!-- Port 3306 Badge on ECS -> RDS Proxy line -->
+    <g transform="translate(475, 455)">
       <rect width="65" height="18" class="port-badge" />
       <text x="32.5" y="12" class="port-text">MySQL :3306</text>
     </g>
-    <text x="475" y="442" font-size="9" font-weight="700" fill="#047857">6. DB Queries</text>
+    <text x="475" y="450" font-size="9" font-weight="700" fill="#047857">6. DB Queries</text>
 
-    <!-- 6. ECS Tasks Egress connection to NAT Gateway (for pulling images, APIs, etc.) -->
+    <!-- 7. ECS Tasks Egress connection to NAT Gateway (for pulling images, APIs, etc.) -->
     <!-- Task A top: x=465, y=330 -->
     <!-- NAT GW center bottom: x=340+15+15+190/2 = 450, y=80+60+35+75 = 250 -->
     <path d="M 465 330 L 465 260 L 450 260 L 450 250" class="flow-line-dash" />
     <path d="M 705 330 L 705 305 L 450 305 L 450 250" class="flow-line-dash" />
     <!-- NAT GW to IGW for Internet access -->
-    <!-- NAT GW top: y=80+60+35 = 175. IGW: y=252 -->
     <path d="M 450 175 L 450 155 Q 450 135 410 135 L 322 135 L 322 250" class="flow-line-dash" marker-end="url(#arrow)" />
     <text x="350" y="125" font-size="8" font-weight="600" fill="#64748b">Egress to Internet</text>
   </g>
