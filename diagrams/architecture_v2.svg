@@ -108,7 +108,7 @@
 
     <!-- ==================== REGIONAL VPC ==================== -->
     <g transform="translate(340, 80)">
-      <rect width="750" height="660" class="vpc-box" />
+      <rect width="750" height="680" class="vpc-box" />
       <text x="20" y="28" class="vpc-label">VPC (10.0.0.0/16)</text>
       
       <!-- Internet Gateway on VPC Border -->
@@ -119,8 +119,8 @@
       </g>
 
       <!-- AZ Columns Boundaries (Dashed Lines) -->
-      <line x1="245" y1="45" x2="245" y2="640" class="az-line" />
-      <line x1="495" y1="45" x2="495" y2="640" class="az-line" />
+      <line x1="245" y1="45" x2="245" y2="660" class="az-line" />
+      <line x1="495" y1="45" x2="495" y2="660" class="az-line" />
 
       <!-- AZ Labels -->
       <text x="132" y="40" text-anchor="middle" class="az-label">Availability Zone A</text>
@@ -130,11 +130,11 @@
       <!-- ==================== SUBNET LAYER 1: PUBLIC ==================== -->
       <!-- Subnet A - Public -->
       <g transform="translate(15, 60)">
-        <rect width="220" height="130" class="subnet-public" />
-        <text x="10" y="14" class="subnet-title pub">Public Subnet A</text>
+        <rect width="220" height="145" class="subnet-public" />
+        <text x="10" y="18" class="subnet-title pub">Public Subnet A</text>
         
         <!-- NAT Gateway -->
-        <g transform="translate(15, 25)" filter="url(#shadow)">
+        <g transform="translate(15, 38)" filter="url(#shadow)">
           <rect width="190" height="85" class="card" />
           <circle cx="28" cy="43" r="14" fill="#f59e0b" opacity="0.2" />
           <path d="M 22 43 L 34 43 M 28 37 L 28 49 M 24 39 L 32 47" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" fill="none" />
@@ -146,11 +146,11 @@
 
       <!-- Subnet B - Public -->
       <g transform="translate(250, 60)">
-        <rect width="230" height="130" class="subnet-public" />
+        <rect width="230" height="145" class="subnet-public" />
         <text x="10" y="18" class="subnet-title pub">Public Subnet B</text>
 
         <!-- ALB + WAF WebACL Protected Group -->
-        <g transform="translate(15, 30)" filter="url(#shadow)">
+        <g transform="translate(15, 38)" filter="url(#shadow)">
           <rect width="200" height="85" class="card" style="stroke: #ef4444; stroke-width: 1.5;" />
           <!-- WAF Shield Icon -->
           <circle cx="28" cy="42" r="14" fill="#ef4444" opacity="0.15" />
@@ -167,15 +167,15 @@
 
       <!-- Subnet C - Public -->
       <g transform="translate(495, 60)">
-        <rect width="240" height="130" class="subnet-public" />
+        <rect width="240" height="145" class="subnet-public" />
         <text x="10" y="18" class="subnet-title pub">Public Subnet C</text>
-        <text x="120" y="75" text-anchor="middle" font-size="10" fill="#d97706" font-style="italic">Spare Capacity</text>
+        <text x="120" y="80" text-anchor="middle" font-size="10" fill="#d97706" font-style="italic">Spare Capacity</text>
       </g>
 
 
       <!-- ==================== SUBNET LAYER 2: PRIVATE ==================== -->
       <!-- Subnet A - Private -->
-      <g transform="translate(15, 215)">
+      <g transform="translate(15, 225)">
         <rect width="220" height="160" class="subnet-private" />
         <text x="10" y="18" class="subnet-title priv">Private Subnet A</text>
 
@@ -194,7 +194,7 @@
       </g>
 
       <!-- Subnet B - Private -->
-      <g transform="translate(250, 215)">
+      <g transform="translate(250, 225)">
         <rect width="230" height="160" class="subnet-private" />
         <text x="10" y="18" class="subnet-title priv">Private Subnet B</text>
 
@@ -213,7 +213,7 @@
       </g>
 
       <!-- Subnet C - Private -->
-      <g transform="translate(495, 215)">
+      <g transform="translate(495, 225)">
         <rect width="240" height="160" class="subnet-private" />
         <text x="10" y="18" class="subnet-title priv">Private Subnet C</text>
         <text x="100" y="18" font-size="8.5" font-weight="700" fill="#2563eb">🔄 Auto Scaling (stg/prod)</text>
@@ -235,7 +235,7 @@
 
       <!-- ==================== SUBNET LAYER 3: ISOLATED ==================== -->
       <!-- Subnet A - Isolated -->
-      <g transform="translate(15, 385)">
+      <g transform="translate(15, 400)">
         <rect width="220" height="240" class="subnet-isolated" />
         <text x="10" y="18" class="subnet-title iso">Isolated Subnet A</text>
 
@@ -262,7 +262,7 @@
       </g>
 
       <!-- Subnet B - Isolated -->
-      <g transform="translate(250, 385)">
+      <g transform="translate(250, 400)">
         <rect width="230" height="240" class="subnet-isolated" />
         <text x="10" y="18" class="subnet-title iso">Isolated Subnet B</text>
 
@@ -289,7 +289,7 @@
       </g>
 
       <!-- Subnet C - Isolated -->
-      <g transform="translate(495, 385)">
+      <g transform="translate(495, 400)">
         <rect width="240" height="240" class="subnet-isolated" />
         <text x="10" y="18" class="subnet-title iso">Isolated Subnet C</text>
         <text x="100" y="18" font-size="8.5" font-weight="700" fill="#059669">🛡️ Prod DB Protection</text>
@@ -332,65 +332,62 @@
     </g>
 
     <!-- 3. CloudFront to ALB (via IGW) -->
-    <path d="M 305 295 L 322 295 L 322 252" class="flow-line-blue" />
-    <path d="M 322 252 L 335 252 L 350 268 L 590 268 Q 605 268 605 251 L 605 212" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+    <path d="M 305 295 L 322 295 L 322 270" class="flow-line-blue" />
+    <path d="M 322 270 L 340 270 L 350 295 L 598 295 L 598 220.5 L 605 220.5" class="flow-line-blue" marker-end="url(#arrow-blue)" />
     
     <!-- Port 80/443 Badge on CF -> ALB line -->
-    <g transform="translate(420, 259)">
+    <g transform="translate(420, 286)">
       <rect width="65" height="18" class="port-badge" />
       <text x="32.5" y="12" class="port-text">HTTP :80</text>
     </g>
-    <text x="420" y="251" font-size="9" font-weight="700" fill="#1d4ed8">4. Forward Request</text>
+    <text x="420" y="278" font-size="9" font-weight="700" fill="#1d4ed8">4. Forward Request</text>
 
     <!-- 4. ALB to ECS Tasks -->
-    <path d="M 705 225 L 705 285" class="flow-line-blue" />
-    <path d="M 705 285 L 465 285 L 465 322" class="flow-line-blue" marker-end="url(#arrow-blue)" />
-    <path d="M 705 285 L 705 322" class="flow-line-blue" marker-end="url(#arrow-blue)" />
-    <path d="M 705 285 L 955 285 L 955 322" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+    <path d="M 705 263 L 705 315" class="flow-line-blue" />
+    <path d="M 705 315 L 465 315 L 465 340" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+    <path d="M 705 315 L 705 340" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+    <path d="M 705 315 L 955 315 L 955 340" class="flow-line-blue" marker-end="url(#arrow-blue)" />
 
     <!-- Port 8080 Badge on ALB -> ECS lines -->
-    <g transform="translate(775, 275)">
+    <g transform="translate(775, 305)">
       <rect width="65" height="18" class="port-badge" />
       <text x="32.5" y="12" class="port-text">HTTP :8080</text>
     </g>
-    <text x="775" y="268" font-size="9" font-weight="700" fill="#1d4ed8">5. Route Traffic</text>
+    <text x="775" y="298" font-size="9" font-weight="700" fill="#1d4ed8">5. Route Traffic</text>
 
     <!-- 5. ECS Tasks to RDS Proxy (prod/stg) -->
-    <path d="M 465 440 L 465 492" class="flow-line-blue" marker-end="url(#arrow-blue)" />
-    <path d="M 705 440 L 705 492" class="flow-line-blue" marker-end="url(#arrow-blue)" />
-    <path d="M 955 440 L 955 492" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+    <path d="M 465 450 L 465 510" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+    <path d="M 705 450 L 705 510" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+    <path d="M 955 450 L 955 510" class="flow-line-blue" marker-end="url(#arrow-blue)" />
 
     <!-- ECS Tasks to DB Directly (dev bypass) -->
-    <!-- Points left of task to left of database (y=440 to 592) -->
-    <path d="M 450 440 L 450 592" class="flow-line-dash" marker-end="url(#arrow)" />
-    <text x="382" y="520" font-size="8" fill="#64748b" font-weight="600">dev bypass</text>
+    <!-- Points left of task to left of database (y=450 to 610) -->
+    <path d="M 450 450 L 450 610" class="flow-line-dash" marker-end="url(#arrow)" />
+    <text x="382" y="535" font-size="8" fill="#64748b" font-weight="600">dev bypass</text>
 
     <!-- 6. RDS Proxy to Aurora DB -->
-    <!-- Proxy A/B/C bottom: y=570. DB A/B/C top: y=595 -->
-    <path d="M 465 570 L 465 592" class="flow-line-green" marker-end="url(#arrow-green)" />
-    <path d="M 705 570 L 705 592" class="flow-line-green" marker-end="url(#arrow-green)" />
-    <path d="M 955 570 L 955 592" class="flow-line-green" marker-end="url(#arrow-green)" />
+    <path d="M 465 585 L 465 610" class="flow-line-green" marker-end="url(#arrow-green)" />
+    <path d="M 705 585 L 705 610" class="flow-line-green" marker-end="url(#arrow-green)" />
+    <path d="M 955 585 L 955 610" class="flow-line-green" marker-end="url(#arrow-green)" />
 
     <!-- Replication link between Writer and Readers (prod/stg only) -->
-    <path d="M 560 642 L 610 642" class="flow-line-dash" marker-end="url(#arrow)" />
-    <path d="M 830 642 L 880 642" class="flow-line-dash" marker-end="url(#arrow)" />
-    <text x="585" y="635" text-anchor="middle" font-size="8" fill="#64748b" font-weight="600">Replicate (prod/stg)</text>
-    <text x="855" y="635" text-anchor="middle" font-size="8" fill="#64748b" font-weight="600">Replicate (prod/stg)</text>
+    <path d="M 560 657.5 L 605 657.5" class="flow-line-dash" marker-end="url(#arrow)" />
+    <path d="M 805 657.5 L 855 657.5" class="flow-line-dash" marker-end="url(#arrow)" />
+    <text x="582.5" y="650" text-anchor="middle" font-size="8" fill="#64748b" font-weight="600">Replicate (prod/stg)</text>
+    <text x="830" y="650" text-anchor="middle" font-size="8" fill="#64748b" font-weight="600">Replicate (prod/stg)</text>
 
     <!-- Port 3306 Badge on ECS -> RDS Proxy line -->
-    <g transform="translate(475, 455)">
+    <g transform="translate(475, 470)">
       <rect width="65" height="18" class="port-badge" />
       <text x="32.5" y="12" class="port-text">MySQL :3306</text>
     </g>
-    <text x="475" y="450" font-size="9" font-weight="700" fill="#047857">6. DB Queries</text>
+    <text x="475" y="465" font-size="9" font-weight="700" fill="#047857">6. DB Queries</text>
 
     <!-- 7. ECS Tasks Egress connection to NAT Gateway (for pulling images, APIs, etc.) -->
-    <!-- Task A top: x=465, y=330 -->
-    <!-- NAT GW center bottom: x=340+15+15+190/2 = 465, y=80+60+25+85 = 250 -->
-    <path d="M 465 330 L 465 250" class="flow-line-dash" />
-    <path d="M 705 330 L 705 305 L 465 305 L 465 250" class="flow-line-dash" />
+    <path d="M 465 340 L 465 263" class="flow-line-dash" marker-end="url(#arrow)" />
+    <path d="M 705 340 L 705 325 L 465 325 L 465 263" class="flow-line-dash" marker-end="url(#arrow)" />
     <!-- NAT GW to IGW for Internet access -->
-    <path d="M 465 165 L 465 145 Q 465 135 410 135 L 322 135 L 322 235 Q 322 250 307 250 L 285 250" class="flow-line-dash" marker-end="url(#arrow)" />
-    <text x="350" y="118" font-size="8" font-weight="600" fill="#64748b">Egress to Internet</text>
+    <path d="M 465 178 L 465 115 L 322 115 L 322 252 L 285 252" class="flow-line-dash" marker-end="url(#arrow)" />
+    <text x="350" y="108" font-size="8" font-weight="600" fill="#64748b">Egress to Internet</text>
   </g>
 </svg>
