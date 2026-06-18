@@ -63,6 +63,7 @@
   - `architecture.svg` - **アーキテクチャ図（RDS Proxy 構成版）**
 - `docs/` - 運用ドキュメント・ウォークスルーの格納
   - `walkthrough.md` - **設計・実装履歴ウォークスルー**
+  - [resume.md](file:///c:/Git/learning-ts-concepts/docs/resume.md) - **モダンレジュメ（職務経歴書 / ポートフォリオ連携）**
   - `governance/` - **エンタープライズガバナンス設計ドキュメント（ポートフォリオ用）**
     - [multi-account-design.md](file:///c:/Git/learning-ts-concepts/docs/governance/multi-account-design.md) - マルチアカウント設計方針
     - [security-and-audit.md](file:///c:/Git/learning-ts-concepts/docs/governance/security-and-audit.md) - 監査・セキュリティ基準

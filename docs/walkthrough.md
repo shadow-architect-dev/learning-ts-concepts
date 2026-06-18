@@ -149,3 +149,15 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 - 一括請求（Consolidated Billing）による割引枠の共有ルール。
 - 開発環境（`dev`）における夜間自動停止や Nat Gateway 回避などの徹底したコスト最適化、および AWS Budgets と Cost Anomaly Detection による FinOps 管理設計。
 
+---
+
+## 6. モダンレジュメ（職務経歴書 / ポートフォリオ連携）の追加
+
+本間様のこれまでの物理・クラウド・技術経営にわたるご経歴を、見やすい Markdown テーブルとバッジ構成に整理した [resume.md](file:///c:/Git/learning-ts-concepts/docs/resume.md) を追加しました。
+
+### 構成の特徴
+- **GitHub 成果物マッピング**: 本リポジトリ（`learning-ts-concepts`）における具体的な SRE・IaC・MoC・CI/CD の開発成果をレジュメ内から直接リンクさせ、開発者のポートフォリオとしての市場価値を極大化させました。
+- **実務年数の可視化**: 使用技術（言語・MW・DB・OS）の実務期間を対比形式で整理。
+- **自走力・AI連携のPR**: CTO としての技術経営能力に加え、Gemini 等の生成AIをペアプログラマ・調査エンジンとしてフル活用した完全自走型の問題解決力を PR 項目として明示。
+
+
