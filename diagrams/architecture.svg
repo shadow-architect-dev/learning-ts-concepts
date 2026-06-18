@@ -138,9 +138,9 @@
           <rect width="190" height="85" class="card" />
           <circle cx="28" cy="43" r="14" fill="#f59e0b" opacity="0.2" />
           <path d="M 22 43 L 34 43 M 28 37 L 28 49 M 24 39 L 32 47" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" fill="none" />
-          <text x="52" y="36" class="card-title">NAT Gateway</text>
-          <text x="52" y="54" class="card-subtitle">nat-gateway-a</text>
-          <text x="52" y="70" font-size="9" fill="#94a3b8">Outbound Traffic</text>
+          <text x="52" y="38" class="card-title">NAT Gateway</text>
+          <text x="52" y="56" class="card-subtitle">nat-gateway-a</text>
+          <text x="52" y="72" font-size="9" fill="#94a3b8">Outbound Traffic</text>
         </g>
       </g>
 
@@ -386,11 +386,11 @@
 
     <!-- 7. ECS Tasks Egress connection to NAT Gateway (for pulling images, APIs, etc.) -->
     <!-- Task A top: x=465, y=330 -->
-    <!-- NAT GW center bottom: x=340+15+15+190/2 = 450, y=80+60+35+75 = 250 -->
-    <path d="M 465 330 L 465 260 L 450 260 L 450 250" class="flow-line-dash" />
-    <path d="M 705 330 L 705 305 L 450 305 L 450 250" class="flow-line-dash" />
+    <!-- NAT GW center bottom: x=340+15+15+190/2 = 465, y=80+60+35+85 = 260 -->
+    <path d="M 465 330 L 465 260" class="flow-line-dash" />
+    <path d="M 705 330 L 705 305 L 465 305 L 465 260" class="flow-line-dash" />
     <!-- NAT GW to IGW for Internet access -->
-    <path d="M 450 175 L 450 155 Q 450 135 410 135 L 322 135 L 322 250" class="flow-line-dash" marker-end="url(#arrow)" />
+    <path d="M 465 175 L 465 155 Q 465 135 410 135 L 322 135 L 322 250" class="flow-line-dash" marker-end="url(#arrow)" />
     <text x="350" y="118" font-size="8" font-weight="600" fill="#64748b">Egress to Internet</text>
   </g>
 </svg>
