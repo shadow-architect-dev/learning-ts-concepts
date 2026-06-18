@@ -18,7 +18,7 @@
 
 ### 📊 アーキテクチャ図
 
-![Architecture](diagrams/architecture.svg?v=4)
+![Architecture](diagrams/architecture.svg?v=20260618-2)
 
 ---
 
