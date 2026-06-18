@@ -48,6 +48,11 @@ jobs:
       - name: Install CDKTF CLI
         run: npm install --global cdktf-cli
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
       # PR 時は差分表示 (diff)
       - name: CDKTF Diff
         if: github.event_name == 'pull_request'
