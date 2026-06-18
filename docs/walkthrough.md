@@ -128,3 +128,24 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
     - メッセージ: `feat: add database read replicas for prod/stg and update tests/architecture diagram to match`
 - **GitHub Actions での CI/CD 実行確認**:
   - プッシュに伴い自動実行される GitHub Actions 上でインフラテストおよび CDKTF シンセサイズが正常にパスすること（グリーン状態）をご確認ください。
+
+---
+
+## 5. ポートフォリオ用ガバナンス設計ドキュメントの追加
+
+本テンプレートがポートフォリオとしての価値を最大化できるよう、検証用シングルアカウント構成（コスト0円での動作チェック）の背景にあるエンタープライズ向けの「設計・財務ガバナンス思想」を明文化したドキュメントを追加しました。
+
+### 追加された設計書
+
+#### 1. [multi-account-design.md (マルチアカウント設計方針)](file:///c:/Git/learning-ts-concepts/docs/governance/multi-account-design.md)
+- AWS Organizations と AWS Control Tower を活用した組織（OU）設計。
+- 各アカウント（Management, Log Archive, Audit, Shared Services, workloads）の明確な役割定義とリポジトリ分離の設計思想。
+
+#### 2. [security-and-audit.md (監査・セキュリティ基準)](file:///c:/Git/learning-ts-concepts/docs/governance/security-and-audit.md)
+- SCP (Service Control Policy) を用いた「許可外リージョンでのリソース作成禁止」「セキュリティツールの無効化防止」などの強制ガードレール設計。
+- GuardDuty / Security Hub / Config の委任管理（Delegated Admin）の概念。
+
+#### 3. [cost-management.md (コスト管理・財務ガバナンス方針)](file:///c:/Git/learning-ts-concepts/docs/governance/cost-management.md)
+- 一括請求（Consolidated Billing）による割引枠の共有ルール。
+- 開発環境（`dev`）における夜間自動停止や Nat Gateway 回避などの徹底したコスト最適化、および AWS Budgets と Cost Anomaly Detection による FinOps 管理設計。
+

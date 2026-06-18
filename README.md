@@ -63,6 +63,10 @@
   - `architecture.svg` - **アーキテクチャ図（RDS Proxy 構成版）**
 - `docs/` - 運用ドキュメント・ウォークスルーの格納
   - `walkthrough.md` - **設計・実装履歴ウォークスルー**
+  - `governance/` - **エンタープライズガバナンス設計ドキュメント（ポートフォリオ用）**
+    - [multi-account-design.md](file:///c:/Git/learning-ts-concepts/docs/governance/multi-account-design.md) - マルチアカウント設計方針
+    - [security-and-audit.md](file:///c:/Git/learning-ts-concepts/docs/governance/security-and-audit.md) - 監査・セキュリティ基準
+    - [cost-management.md](file:///c:/Git/learning-ts-concepts/docs/governance/cost-management.md) - コスト管理・財務ガバナンス方針
 - `app/` - アプリケーションコード
   - `Dockerfile` - Nginxコンテナ定義（**セキュリティ自動パッチ機能付き**）
   - `index.html` - 静的デモ画面
