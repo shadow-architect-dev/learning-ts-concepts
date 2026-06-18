@@ -62,6 +62,11 @@ test("ThreeTierStack Synthesizes Correctly", () => {
   const appContainer = containerDefs.find((c: any) => c.Name === "AppContainer");
   expect(appContainer).toBeDefined();
 
+  // ポートマッピングの確認（非Root化: 8080）
+  expect(appContainer.PortMappings).toContainEqual(
+    expect.objectContaining({ ContainerPort: 8080 })
+  );
+
   // 環境変数の確認
   const env = appContainer.Environment;
   expect(env).toContainEqual({ Name: "DD_AGENT_HOST", Value: "localhost" });
@@ -167,6 +172,45 @@ test("ThreeTierStack - Production Environment Synthesizes Correctly", () => {
 
   // DBInstance が 3 つ（Writer x1, Reader x2）作成されていることを確認
   template.resourceCountIs("AWS::RDS::DBInstance", 3);
+
+  // データベース (RDS Aurora Cluster) の削除保護と RETAIN ポリシーの検証
+  template.hasResource("AWS::RDS::DBCluster", {
+    DeletionPolicy: "Retain",
+    UpdateReplacePolicy: "Retain",
+    Properties: Match.objectLike({
+      DeletionProtection: true,
+    }),
+  });
+
+  // ECS Auto Scaling (Target Tracking) が設定されていることを検証
+  template.hasResourceProperties("AWS::ApplicationAutoScaling::ScalableTarget", {
+    MinCapacity: 2,
+    MaxCapacity: 10,
+    ScalableDimension: "ecs:service:DesiredCount",
+    ServiceNamespace: "ecs",
+  });
+
+  // CPU ターゲット追跡ポリシーが存在することを確認
+  template.hasResourceProperties("AWS::ApplicationAutoScaling::ScalingPolicy", {
+    PolicyType: "TargetTrackingScaling",
+    TargetTrackingScalingPolicyConfiguration: Match.objectLike({
+      TargetValue: 70,
+      PredefinedMetricSpecification: {
+        PredefinedMetricType: "ECSServiceAverageCPUUtilization",
+      },
+    }),
+  });
+
+  // メモリ ターゲット追跡ポリシーが存在することを確認
+  template.hasResourceProperties("AWS::ApplicationAutoScaling::ScalingPolicy", {
+    PolicyType: "TargetTrackingScaling",
+    TargetTrackingScalingPolicyConfiguration: Match.objectLike({
+      TargetValue: 70,
+      PredefinedMetricSpecification: {
+        PredefinedMetricType: "ECSServiceAverageMemoryUtilization",
+      },
+    }),
+  });
 
   // 夜間一時停止スケジュール（dev専用）が存在しないことを確認
   template.resourceCountIs("AWS::Lambda::Function", 0);

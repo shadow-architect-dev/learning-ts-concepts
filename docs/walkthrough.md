@@ -149,5 +149,44 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 - 一括請求（Consolidated Billing）による割引枠の共有ルール。
 - 開発環境（`dev`）における夜間自動停止や Nat Gateway 回避などの徹底したコスト最適化、および AWS Budgets と Cost Anomaly Detection による FinOps 管理設計。
 
+## 6. SRE観点での追加設計改善（非Root実行・バージョン固定・本番保護・オートスケーリング）
+
+引き継ぎ後に、SREおよびセキュリティレベルをプロダクションレディに高めるための追加設計改善を実装し、最新のコードツリーに適用しました。
+
+### 変更内容
+
+#### 1. [Dockerfile (コンテナセキュリティ)](file:///d:/kai.oshino/Projects/Git/private/learning-ts-concepts/app/Dockerfile)
+- **非Root実行化**: Nginxを特権ユーザー（root）ではなく、非特権の `nginx` ユーザーで起動するように設定。公開ポートを `8080` に変更。
+- **設定ファイルの追加**: PID書き込み先やキャッシュディレクトリ等のパーミッションエラーを回避するため、PIDと一時ファイルパスを `/tmp` に逃がしたカスタム [nginx.conf](file:///d:/kai.oshino/Projects/Git/private/learning-ts-concepts/app/nginx.conf) および [default.conf](file:///d:/kai.oshino/Projects/Git/private/learning-ts-concepts/app/default.conf) を追加。
+- **バージョン固定**: ベースイメージを `nginx:1.25.4-alpine` にピン留め。
+
+#### 2. [compute.ts (CDKインフラ定義)](file:///d:/kai.oshino/Projects/Git/private/learning-ts-concepts/infra/lib/constructs/compute.ts)
+- Datadog Agent のイメージを `gcr.io/datadoghq/agent:7.54.0` にピン留め。
+- Fargateのポートマッピングを `8080` に変更。
+
+#### 3. [database.ts (CDKデータベース定義)](file:///d:/kai.oshino/Projects/Git/private/learning-ts-concepts/infra/lib/constructs/database.ts)
+- 本番環境（`prod`）のみ、DBの削除保護（`deletionProtection: true`）および `removalPolicy: RETAIN` を適用。
+
+#### 4. [stack.ts (CDKインフラ定義)](file:///d:/kai.oshino/Projects/Git/private/learning-ts-concepts/infra/lib/stack.ts)
+- ALBのターゲットポートを `8080` に変更。
+- 本番（`prod`/最小2, 最大10）およびステージング（`stg`/最小1, 最大4）環境に対して、CPUおよびメモリ使用率70%をターゲットとする **ターゲット追跡動的オートスケーリング** を実装。
+
+#### 5. [stack.test.ts (CDKアサーションテスト)](file:///d:/kai.oshino/Projects/Git/private/learning-ts-concepts/infra/test/stack.test.ts)
+- AppContainerのポートが8080であることをテストアサーションに追加。
+- 本番環境における DB削除保護/RETAIN設定、および ECS Auto Scaling ポリシーの適用が定義通りであるかを検証するテストケースを新規追加。
+
+---
+
+## 🧪 動作確認（全体チェック完了）
+
+### AWS CDK (infra)
+- `npm test` によるユニットテストがすべて正常にパスすることを確認（PASS）。
+- `cdk synth` による CloudFormation 合成確認（dev / stg / prod）が正常に完了することを確認。
+
+### CDKTF (monitoring)
+- Windows環境でのインストールエラーを回避しつつ、依存関係のクリーンインストール（`npm install --ignore-scripts`）が完了。
+- `npm run compile`（TypeScriptコンパイル）が正常に完了することを確認。
+- `npx cdktf synth` による Terraform JSON 合成が正常に完了することを確認。
+
 
 

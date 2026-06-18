@@ -84,10 +84,10 @@ export class ComputeConstruct extends Construct {
       },
       secrets: containerSecrets,
     });
-    container.addPortMappings({ containerPort: 80 });
+    container.addPortMappings({ containerPort: 8080 });
 
     const ddAgentContainer = taskDef.addContainer("DatadogAgent", {
-      image: ecs.ContainerImage.fromRegistry("gcr.io/datadoghq/agent:latest"),
+      image: ecs.ContainerImage.fromRegistry("gcr.io/datadoghq/agent:7.54.0"),
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: "datadog-agent" }),
       environment: {
         ECS_FARGATE: "true",

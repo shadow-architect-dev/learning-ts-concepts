@@ -48,7 +48,10 @@ export class DatabaseConstruct extends Construct {
       readers: readers,
       serverlessV2MinCapacity: dbCapacity,
       serverlessV2MaxCapacity: dbCapacity * 2,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: props.envName === "prod" 
+        ? cdk.RemovalPolicy.RETAIN 
+        : cdk.RemovalPolicy.DESTROY,
+      deletionProtection: props.envName === "prod",
       securityGroups: props.dbSecurityGroup ? [props.dbSecurityGroup] : undefined,
     });
 

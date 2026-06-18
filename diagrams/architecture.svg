@@ -186,7 +186,7 @@
           <rect x="21" y="41" width="14" height="14" rx="2" fill="none" stroke="#3b82f6" stroke-width="2" />
           <circle cx="28" cy="48" r="3" fill="#3b82f6" />
           <text x="52" y="30" class="card-title">ECS Task (Fargate)</text>
-          <text x="52" y="44" class="card-subtitle">Port: 80 (App) / 8125,8126 (DD)</text>
+          <text x="52" y="44" class="card-subtitle">Port: 8080 (App) / 8125,8126 (DD)</text>
           <text x="52" y="56" class="card-subtitle">App Image: app-image</text>
           <text x="52" y="68" class="card-subtitle" fill="#64748b">Sidecar: Datadog Agent</text>
           <text x="52" y="90" font-size="9" fill="#3b82f6" font-weight="600">Active (AZ-a)</text>
@@ -205,7 +205,7 @@
           <rect x="21" y="41" width="14" height="14" rx="2" fill="none" stroke="#3b82f6" stroke-width="2" />
           <circle cx="28" cy="48" r="3" fill="#3b82f6" />
           <text x="52" y="30" class="card-title">ECS Task (Fargate)</text>
-          <text x="52" y="44" class="card-subtitle">Port: 80 (App) / 8125,8126 (DD)</text>
+          <text x="52" y="44" class="card-subtitle">Port: 8080 (App) / 8125,8126 (DD)</text>
           <text x="52" y="56" class="card-subtitle">App Image: app-image</text>
           <text x="52" y="68" class="card-subtitle" fill="#64748b">Sidecar: Datadog Agent</text>
           <text x="52" y="90" font-size="9" fill="#3b82f6" font-weight="600">Active (AZ-b)</text>
@@ -216,6 +216,7 @@
       <g transform="translate(495, 215)">
         <rect width="240" height="160" class="subnet-private" />
         <text x="10" y="18" class="subnet-title priv">Private Subnet C</text>
+        <text x="100" y="18" font-size="8.5" font-weight="700" fill="#2563eb">🔄 Auto Scaling (stg/prod)</text>
 
         <!-- ECS Task C -->
         <g transform="translate(20, 35)" filter="url(#shadow)">
@@ -224,7 +225,7 @@
           <rect x="21" y="41" width="14" height="14" rx="2" fill="none" stroke="#3b82f6" stroke-width="2" />
           <circle cx="28" cy="48" r="3" fill="#3b82f6" />
           <text x="52" y="30" class="card-title">ECS Task (Fargate)</text>
-          <text x="52" y="44" class="card-subtitle">Port: 80 (App) / 8125,8126 (DD)</text>
+          <text x="52" y="44" class="card-subtitle">Port: 8080 (App) / 8125,8126 (DD)</text>
           <text x="52" y="56" class="card-subtitle">App Image: app-image</text>
           <text x="52" y="68" class="card-subtitle" fill="#64748b">Sidecar: Datadog Agent</text>
           <text x="52" y="90" font-size="9" fill="#3b82f6" font-weight="600">Active (AZ-c)</text>
@@ -291,6 +292,7 @@
       <g transform="translate(495, 385)">
         <rect width="240" height="240" class="subnet-isolated" />
         <text x="10" y="18" class="subnet-title iso">Isolated Subnet C</text>
+        <text x="100" y="18" font-size="8.5" font-weight="700" fill="#059669">🛡️ Prod DB Protection</text>
 
         <!-- RDS Proxy C (prod/stg only) -->
         <g transform="translate(20, 30)" filter="url(#shadow)">
@@ -346,10 +348,10 @@
     <path d="M 705 285 L 705 322" class="flow-line-blue" marker-end="url(#arrow-blue)" />
     <path d="M 705 285 L 955 285 L 955 322" class="flow-line-blue" marker-end="url(#arrow-blue)" />
 
-    <!-- Port 80 Badge on ALB -> ECS lines -->
+    <!-- Port 8080 Badge on ALB -> ECS lines -->
     <g transform="translate(775, 275)">
       <rect width="65" height="18" class="port-badge" />
-      <text x="32.5" y="12" class="port-text">HTTP :80</text>
+      <text x="32.5" y="12" class="port-text">HTTP :8080</text>
     </g>
     <text x="775" y="268" font-size="9" font-weight="700" fill="#1d4ed8">5. Route Traffic</text>
 

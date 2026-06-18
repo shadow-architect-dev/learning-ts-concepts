@@ -108,7 +108,7 @@ export class ThreeTierStack extends cdk.Stack {
     // Add ECS Service as target only if X-Origin-Verify header matches
     if (compute.service) {
       listener.addTargets("EcsTarget", {
-        port: 80,
+        port: 8080,
         protocol: elbv2.ApplicationProtocol.HTTP,
         targets: [compute.service],
         healthCheck: {
@@ -188,6 +188,26 @@ export class ThreeTierStack extends cdk.Stack {
         zone: zone,
         recordName: props.domainName,
         target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
+      });
+    }
+
+    // 本番環境 (prod) および ステージング環境 (stg) の動的オートスケーリング (Target Tracking)
+    if (compute.service && (envName === "prod" || envName === "stg")) {
+      const scaling = compute.service.autoScaleTaskCount({
+        minCapacity: envName === "prod" ? 2 : 1, // prodは最低2台でマルチAZ可用性確保、stgは1台から
+        maxCapacity: envName === "prod" ? 10 : 4,
+      });
+
+      scaling.scaleOnCpuUtilization("CpuScaling", {
+        targetUtilizationPercent: 70,
+        scaleInCooldown: cdk.Duration.seconds(300),
+        scaleOutCooldown: cdk.Duration.seconds(60),
+      });
+
+      scaling.scaleOnMemoryUtilization("MemoryScaling", {
+        targetUtilizationPercent: 70,
+        scaleInCooldown: cdk.Duration.seconds(300),
+        scaleOutCooldown: cdk.Duration.seconds(60),
       });
     }
 
