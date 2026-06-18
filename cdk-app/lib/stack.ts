@@ -77,7 +77,7 @@ export class ThreeTierStack extends cdk.Stack {
     // Allow ECS tasks to connect to the DB (or Proxy)
     if (compute.service) {
       if (db.proxy) {
-        db.proxy.connections.allowDefaultPortFrom(compute.service);
+        db.proxy.connections.allowFrom(compute.service, cdk.aws_ec2.Port.tcp(3306));
       } else {
         db.cluster.connections.allowDefaultPortFrom(compute.service);
       }
