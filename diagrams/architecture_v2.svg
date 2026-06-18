@@ -321,14 +321,14 @@
     <!-- 1. Route 53 DNS Interaction -->
     <path d="M 85 180 L 85 250" class="flow-line-dash" marker-end="url(#arrow)" />
     <path d="M 100 250 L 100 180" class="flow-line-dash" marker-end="url(#arrow)" />
-    <text x="108" y="210" font-size="9" fill="#991b1b" font-weight="700">1. DNS Query</text>
-    <text x="108" y="222" font-size="8" fill="#94a3b8">2. Returns CNAME</text>
+    <text x="75" y="210" text-anchor="end" font-size="9" fill="#991b1b" font-weight="700">1. DNS Query</text>
+    <text x="75" y="222" text-anchor="end" font-size="8" fill="#94a3b8">2. Returns CNAME</text>
 
     <!-- 2. Internet to CloudFront -->
     <path d="M 140 135 L 160 135 L 160 295 L 180 295" class="flow-line-blue" marker-end="url(#arrow-blue)" />
-    <g transform="translate(150, 185)">
-      <text x="0" y="10" font-size="9" font-weight="700" fill="#1d4ed8" text-anchor="end">3. User Request</text>
-      <text x="0" y="20" font-size="8" fill="#64748b" text-anchor="end">HTTPS :443</text>
+    <g transform="translate(168, 190)">
+      <text x="0" y="10" font-size="9" font-weight="700" fill="#1d4ed8">3. User Request</text>
+      <text x="0" y="20" font-size="8" fill="#64748b">HTTPS :443</text>
     </g>
 
     <!-- 3. CloudFront to ALB (via IGW) -->
