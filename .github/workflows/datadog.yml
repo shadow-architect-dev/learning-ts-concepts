@@ -21,6 +21,12 @@ jobs:
     defaults:
       run:
         working-directory: cdktf-datadog
+    env:
+      TERRAFORM_STATE_BUCKET: ${{ secrets.TERRAFORM_STATE_BUCKET }}
+      TERRAFORM_LOCK_TABLE: ${{ secrets.TERRAFORM_LOCK_TABLE }}
+      TERRAFORM_STATE_REGION: ap-northeast-1
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     steps:
       - name: Checkout Code
