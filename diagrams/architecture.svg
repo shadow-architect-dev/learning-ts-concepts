@@ -131,10 +131,10 @@
       <!-- Subnet A - Public -->
       <g transform="translate(15, 60)">
         <rect width="220" height="130" class="subnet-public" />
-        <text x="10" y="18" class="subnet-title pub">Public Subnet A</text>
+        <text x="10" y="14" class="subnet-title pub">Public Subnet A</text>
         
         <!-- NAT Gateway -->
-        <g transform="translate(15, 15)" filter="url(#shadow)">
+        <g transform="translate(15, 25)" filter="url(#shadow)">
           <rect width="190" height="85" class="card" />
           <circle cx="28" cy="43" r="14" fill="#f59e0b" opacity="0.2" />
           <path d="M 22 43 L 34 43 M 28 37 L 28 49 M 24 39 L 32 47" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" fill="none" />
@@ -333,7 +333,7 @@
 
     <!-- 3. CloudFront to ALB (via IGW) -->
     <path d="M 305 295 L 322 295 L 322 252" class="flow-line-blue" />
-    <path d="M 322 252 L 335 252 L 350 268 L 590 268 Q 605 268 605 251 L 605 155" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+    <path d="M 322 252 L 335 252 L 350 268 L 590 268 Q 605 268 605 251 L 605 212" class="flow-line-blue" marker-end="url(#arrow-blue)" />
     
     <!-- Port 80/443 Badge on CF -> ALB line -->
     <g transform="translate(420, 259)">
@@ -386,11 +386,11 @@
 
     <!-- 7. ECS Tasks Egress connection to NAT Gateway (for pulling images, APIs, etc.) -->
     <!-- Task A top: x=465, y=330 -->
-    <!-- NAT GW center bottom: x=340+15+15+190/2 = 465, y=80+60+15+85 = 240 -->
-    <path d="M 465 330 L 465 240" class="flow-line-dash" />
-    <path d="M 705 330 L 705 305 L 465 305 L 465 240" class="flow-line-dash" />
+    <!-- NAT GW center bottom: x=340+15+15+190/2 = 465, y=80+60+25+85 = 250 -->
+    <path d="M 465 330 L 465 250" class="flow-line-dash" />
+    <path d="M 705 330 L 705 305 L 465 305 L 465 250" class="flow-line-dash" />
     <!-- NAT GW to IGW for Internet access -->
-    <path d="M 465 155 L 465 145 Q 465 135 410 135 L 322 135 L 322 250" class="flow-line-dash" marker-end="url(#arrow)" />
+    <path d="M 465 165 L 465 145 Q 465 135 410 135 L 322 135 L 322 250" class="flow-line-dash" marker-end="url(#arrow)" />
     <text x="350" y="118" font-size="8" font-weight="600" fill="#64748b">Egress to Internet</text>
   </g>
 </svg>
