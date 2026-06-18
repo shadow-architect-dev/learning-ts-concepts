@@ -390,7 +390,7 @@
     <path d="M 465 330 L 465 250" class="flow-line-dash" />
     <path d="M 705 330 L 705 305 L 465 305 L 465 250" class="flow-line-dash" />
     <!-- NAT GW to IGW for Internet access -->
-    <path d="M 465 165 L 465 145 Q 465 135 410 135 L 322 135 L 322 250" class="flow-line-dash" marker-end="url(#arrow)" />
+    <path d="M 465 165 L 465 145 Q 465 135 410 135 L 322 135 L 322 235 Q 322 250 307 250 L 285 250" class="flow-line-dash" marker-end="url(#arrow)" />
     <text x="350" y="118" font-size="8" font-weight="600" fill="#64748b">Egress to Internet</text>
   </g>
 </svg>
