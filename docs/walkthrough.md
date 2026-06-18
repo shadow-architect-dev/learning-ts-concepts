@@ -70,38 +70,61 @@
 
 ---
 
+## 4. stg/prod 環境へのリードレプリカ導入および構成整合
+
+本番（`prod`）およびステージング（`stg`）環境において、接続数オーバーおよびフェイルオーバー対策として **Amazon RDS Proxy** に加え、**Aurora Serverless v2 のリードレプリカ (Reader 2台)** を導入し、それに対応するテストコードおよびアーキテクチャ構成図の整合性を確保しました。
+
+### 変更内容
+
+#### 1. [database.ts (RDSインフラ定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/database.ts)
+- `prod` / `stg` 環境のみ Aurora Serverless v2 のリードレプリカ (`reader1`, `reader2`) を `readers` プロパティへ追加する実装（ローカル適用済み）を確認。
+- `dev` 環境は引き続きシングルWriter構成（Proxyなし・Readerなし）を維持し、無駄な追加料金が発生しないようコスト最適化設計を徹底。
+
+#### 2. [stack.test.ts (CDKユニットテストの追加と強化)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
+- `dev` 環境に加え、新たに `stg` および `prod` 用 of テストケースを新規追加。
+- 各環境ごとに、以下のリソース構成が期待通りに構築されているか検証するアサーションを追加：
+  - `stg` / `prod` 環境: `AWS::RDS::DBProxy` が 1 つ作成され、かつ `AWS::RDS::DBInstance` が合計 3 つ（Writer 1台 + Reader 2台）作成されていること。夜間一時停止スケジュール（dev専用）が存在しないこと。
+  - `dev` 環境: `AWS::RDS::DBProxy` は 0 件、かつ `AWS::RDS::DBInstance` が 1 つ（Writer のみ、Reader なし）であること。
+
+#### 3. [architecture.svg (アーキテクチャ構成図の更新)](file:///c:/Git/learning-ts-concepts/diagrams/architecture.svg)
+- AZ-b および AZ-c 的な Isolated サブネット内に `Aurora DB (Reader) (prod/stg only)` を追加。
+- RDS Proxy から Reader への接続線および Writer から Reader へのレプリケーション関係（`Replicate (prod/stg)`）を構成図に追加。
+
+---
+
 ## 動作確認
 
 ### AWS CDK (infra)
 ```bash
-PASS test/stack.test.ts (8.018 s)
-  √ ThreeTierStack Synthesizes Correctly (690 ms)
+> cdk-three-tier-3az@0.1.0 test
+> jest
+
+PASS test/stack.test.ts (11.026 s)
+  √ ThreeTierStack Synthesizes Correctly (958 ms)
+  √ ThreeTierStack - Staging Environment Synthesizes Correctly (651 ms)
+  √ ThreeTierStack - Production Environment Synthesizes Correctly (571 ms)
 
 Test Suites: 1 passed, 1 total
-Tests:       1 passed, 1 total
+Tests:       3 passed, 3 total
 Snapshots:   0 total
-Time:        8.253 s, estimated 9 s
+Time:        11.233 s, estimated 13 s
 Ran all test suites.
 ```
 
 ### CDKTF (monitoring)
 ```bash
-> tsc --noEmit
-# 正常に終了（エラーなし）
-
 # 環境変数をシミュレートした状態でのローカル synth 検証
 > $env:TERRAFORM_STATE_BUCKET="dummy"; $env:TERRAFORM_LOCK_TABLE="dummy"; npx cdktf synth
 Generated Terraform code for the stacks: datadog-monitoring-dev
-# cdk.tf.json 内の backend が正しく "s3" として出力されていることを確認済
+# シンセサイズがエラーなく完了することを確認
 ```
 
 ---
 
 ## 次のステップ
-- **プッシュの完了**:
-  - AWSインフラの変更（コミットID: `ffe54c3`）および CDKTF Datadog 監視設定の追加（コミットID: `288fa80`）は、指定された noreply メールアドレスを用いてすべて正常にリモートの `main` ブランチへプッシュされました。
-- **GitHub Secrets の設定**:
-  - GitHub Actions 側の動作のために、GitHub リポジトリ設定（Secrets）に以下の項目を登録してください。
-    - `DATADOG_API_KEY` / `DATADOG_APP_KEY`（Datadog接続用）
-    - `TERRAFORM_STATE_BUCKET` / `TERRAFORM_LOCK_TABLE`（AWS S3バケット名 / DynamoDBテーブル名）
-    - `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`（上記バケット読み書き用の AWS 認証情報）
+- **コミット ＆ プッシュの完了**:
+  - リードレプリカの導入とテスト強化、構成図の整合性対応をすべてコミットし、`main` ブランチへ正常にプッシュしました。
+    - コミットID: `d4da092`
+    - メッセージ: `feat: add database read replicas for prod/stg and update tests/architecture diagram to match`
+- **GitHub Actions での CI/CD 実行確認**:
+  - プッシュに伴い自動実行される GitHub Actions 上でインフラテストおよび CDKTF シンセサイズが正常にパスすること（グリーン状態）をご確認ください。
