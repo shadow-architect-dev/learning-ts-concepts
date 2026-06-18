@@ -324,7 +324,7 @@
     <text x="110" y="215" text-anchor="start" font-size="8" fill="#94a3b8">2. Return CNAME</text>
 
     <!-- 2. Internet to CloudFront -->
-    <path d="M 140 135 L 170 135 L 170 295 L 180 295" class="flow-line-blue" marker-end="url(#arrow-blue)" />
+    <path d="M 140 155 L 170 155 L 170 295 L 180 295" class="flow-line-blue" marker-end="url(#arrow-blue)" />
     <g transform="translate(174, 190)">
       <text x="0" y="10" font-size="9" font-weight="700" fill="#1d4ed8">3. User Request</text>
       <text x="0" y="20" font-size="8" fill="#64748b">HTTPS :443</text>
