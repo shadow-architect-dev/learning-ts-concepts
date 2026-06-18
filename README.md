@@ -18,7 +18,7 @@
 
 ### 📊 アーキテクチャ図
 
-![Architecture](architecture.svg?v=4)
+![Architecture](diagrams/architecture.svg?v=4)
 
 ---
 
@@ -47,18 +47,22 @@
 
 ## 📂 主要ディレクトリ構成
 
-- `cdk-app/` - CDK アプリケーション
+- `infra/` - CDK アプリケーション（AWSインフラ定義）
   - `bin/main.ts` - スタック生成エントリ（dev/stg/prod）
   - `lib/constructs/network.ts` - VPC / セキュリティグループ定義
   - `lib/constructs/compute.ts` - ECS Fargate ＆ **Datadog Agent サイドカー**定義
   - `lib/constructs/database.ts` - Aurora Serverless v2 定義
   - `lib/stack.ts` - 3層アーキテクチャ統合スタック
   - `test/stack.test.ts` - **CDKアサーションテストコード**
-- `cdktf-datadog/` - CDKTF アプリケーション（Datadog監視定義）
+- `monitoring/` - CDKTF アプリケーション（Datadog監視定義）
   - `main.ts` - CDKTFスタック生成エントリ
   - `lib/config/config.ts` - 環境設定抽象化ヘルパー
   - `lib/datadog-stack.ts` - Datadogスタック定義（S3/DynamoDBリモートステート対応）
   - `lib/monitors/` - 各AWSリソース（ECS/RDS）のDatadogモニター（アラート）定義
+- `diagrams/` - 構成図（Architecture Diagram）の格納
+  - `architecture.svg` - **アーキテクチャ図（RDS Proxy 構成版）**
+- `docs/` - 運用ドキュメント・ウォークスルーの格納
+  - `walkthrough.md` - **設計・実装履歴ウォークスルー**
 - `app/` - アプリケーションコード
   - `Dockerfile` - Nginxコンテナ定義（**セキュリティ自動パッチ機能付き**）
   - `index.html` - 静的デモ画面
@@ -69,7 +73,7 @@
 
 ### 1. 依存関係のインストール
 ```powershell
-cd cdk-app
+cd infra
 npm ci
 ```
 
@@ -109,7 +113,7 @@ CDKTF による Datadog への自動デプロイ（GitHub Actions）を動作さ
 `cdktf-datadog` ディレクトリ内で動作確認を行います。
 
 ```powershell
-cd cdktf-datadog
+cd monitoring
 # 1. 依存関係のインストール（Windowsでのnode-ptyビルドエラーを避けるため ignore-scripts を指定）
 npm install --ignore-scripts
 
