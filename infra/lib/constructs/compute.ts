@@ -17,6 +17,7 @@ export interface ComputeConstructProps {
   logDeliveryRoleArn?: string;
   redisHost?: string;
   redisPort?: number;
+  kmsKey?: cdk.aws_kms.IKey;
 }
 
 export class ComputeConstruct extends Construct {
@@ -53,6 +54,7 @@ export class ComputeConstruct extends Construct {
       logGroupName: `/ecs/${props.envName ?? "dev"}/AppExecAudit`,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       retention: cdk.aws_logs.RetentionDays.ONE_MONTH,
+      encryptionKey: props.kmsKey,
     });
 
     const cluster = new ecs.Cluster(this, "EcsCluster", {
@@ -60,7 +62,7 @@ export class ComputeConstruct extends Construct {
       executeCommandConfiguration: {
         logConfiguration: {
           cloudWatchLogGroup: execAuditLogGroup,
-          cloudWatchEncryptionEnabled: false,
+          cloudWatchEncryptionEnabled: props.kmsKey ? true : false,
         },
         logging: ecs.ExecuteCommandLogging.OVERRIDE,
       },
@@ -124,6 +126,7 @@ export class ComputeConstruct extends Construct {
       logGroupName: `/ecs/${props.envName ?? "dev"}/AppContainer`,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       retention: cdk.aws_logs.RetentionDays.ONE_WEEK,
+      encryptionKey: props.kmsKey,
     });
 
     const container = taskDef.addContainer("AppContainer", {

@@ -9,6 +9,7 @@ export interface DatabaseConstructProps {
   envName?: string;
   vpc: cdk.aws_ec2.IVpc;
   dbSecurityGroup?: cdk.aws_ec2.ISecurityGroup;
+  kmsKey?: cdk.aws_kms.IKey;
 }
 
 export class DatabaseConstruct extends Construct {
@@ -28,6 +29,7 @@ export class DatabaseConstruct extends Construct {
         includeSpace: false,
         generateStringKey: "password",
       },
+      encryptionKey: props.kmsKey,
     });
 
     // prod/stg 環境のみリーダーインスタンス（リードレプリカ）を2台追加
@@ -53,6 +55,7 @@ export class DatabaseConstruct extends Construct {
         : cdk.RemovalPolicy.DESTROY,
       deletionProtection: props.envName === "prod",
       securityGroups: props.dbSecurityGroup ? [props.dbSecurityGroup] : undefined,
+      storageEncryptionKey: props.kmsKey,
     });
 
     // 本番（prod）およびステージング（stg）環境のみ RDS Proxy を有効化

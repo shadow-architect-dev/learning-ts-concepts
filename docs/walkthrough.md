@@ -262,3 +262,29 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 #### 2. [stack.test.ts (CDKアサーションテストの更新)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
 - `dev` / `stg`環境テスト：`AWS::ECS::Service` の `EnableExecuteCommand` が `true` であること、監査ロググループが作成されていること、および Task Role に対し SSM/Logs 操作権限ポリシーが正しく設定されていることをアサーション検証。
 - `prod`環境テスト：`AWS::ECS::Service` の `EnableExecuteCommand` が `false` であることの検証を追加。
+
+## 11. AWS KMS によるリソース暗号化ガバナンスの導入（SRE強化フェーズ 3）
+
+データの保護をAWSのデフォルト共有鍵から、アクセス制御とローテーションライフサイクル管理が可能な **KMS カスタマー管理キー (CMK)** によるデータ暗号化へアップグレードしました。
+
+### 変更内容
+
+#### 1. [kms.ts (KMS定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/kms.ts) [NEW]
+- `KmsConstruct` を新規作成。各環境共通で KMS キーを作成し、環境間パリティを担保。
+- セキュリティ要件に合わせ、本番環境（`prod`）のみ **キー自動ローテーション (EnableKeyRotation)** を有効化し、削除ポリシーを `RETAIN`（それ以外は `DESTROY`）に設定。
+- CloudWatch Logs サービスプリンシパル（`logs.<region>.amazonaws.com`）に対して、ロググループの暗号化・復号操作（`kms:Encrypt` 等）を許可するキーポリシー（Key Policy）を設定。
+
+#### 2. [database.ts (RDS & シークレット定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/database.ts)
+- `DatabaseConstruct` 内で、Aurora クラスターの `storageEncryptionKey` に KMS キーを割り当て、DBストレージ暗号化を適用。
+- データベース認証情報シークレット (Secrets Manager) の `encryptionKey` に KMS キーを割り当て、資格情報の暗号化を強化。
+
+#### 3. [compute.ts (ECS Fargate定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/compute.ts)
+- アプリケーションコンテナのロググループ `AppLogGroup` および ECS Exec 用監査ロググループ `EcsExecAuditLogGroup` の `encryptionKey` に KMS キーを割り当て。
+- ECS Cluster の `executeCommandConfiguration` で、監査ログの転送時の暗号化 `cloudWatchEncryptionEnabled` を `true` に設定。
+
+#### 4. [stack.ts (CDKスタック統合)](file:///c:/Git/learning-ts-concepts/infra/lib/stack.ts)
+- `KmsConstruct` をインスタンス化し、作成された KMS キーを `DatabaseConstruct` および `ComputeConstruct` に引き渡し。
+
+#### 5. [stack.test.ts (CDKアサーションテストの更新)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
+- 各環境のテストケースで、`AWS::KMS::Key` が作成されていること、および `prod` 環境のみ `EnableKeyRotation: true` であることをアサーション検証。
+- DB クラスター、Secrets Manager、CloudWatch Logs ロググループのそれぞれに `KmsKeyId` が設定され、KMS 暗号化が適用されていることをアサーション検証。

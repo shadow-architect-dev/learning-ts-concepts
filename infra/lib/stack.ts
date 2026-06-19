@@ -7,6 +7,7 @@ import { DatabaseConstruct } from "./constructs/database";
 import { ComputeConstruct } from "./constructs/compute";
 import { GithubActionsRoleConstruct } from "./constructs/github-role";
 import { CacheConstruct } from "./constructs/cache";
+import { KmsConstruct } from "./constructs/kms";
 
 function getSharedOutputs(envName: string) {
   try {
@@ -79,6 +80,8 @@ export class ThreeTierStack extends cdk.Stack {
 
     const vpcConstruct = new VpcConstruct(this, "VpcConstruct", { envName, vpcCidr });
 
+    const kms = new KmsConstruct(this, "KmsConstruct", { envName });
+
     const cache = new CacheConstruct(this, "CacheConstruct", {
       envName,
       vpc: vpcConstruct.vpc,
@@ -90,6 +93,7 @@ export class ThreeTierStack extends cdk.Stack {
       envName,
       vpc: vpcConstruct.vpc,
       dbSecurityGroup: vpcConstruct.dbSecurityGroup,
+      kmsKey: kms.kmsKey,
     });
 
     // DB接続先ホスト名の決定（Proxy がある場合は Proxy のエンドポイント、ない場合は DB クラスターのホスト名）
@@ -111,6 +115,7 @@ export class ThreeTierStack extends cdk.Stack {
       logDeliveryRoleArn: roleArn,
       redisHost: cache.redisHost,
       redisPort: cache.redisPort,
+      kmsKey: kms.kmsKey,
     });
 
     // GitHub Actions用 IAM ロールの作成（環境ごとにブランチを分離して最小権限を適用）

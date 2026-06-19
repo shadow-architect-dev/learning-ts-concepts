@@ -155,7 +155,7 @@ test("ThreeTierStack Synthesizes Correctly", () => {
       ExecuteCommandConfiguration: {
         Logging: "OVERRIDE",
         LogConfiguration: {
-          CloudWatchEncryptionEnabled: false,
+          CloudWatchEncryptionEnabled: true,
           CloudWatchLogGroupName: Match.anyValue(),
         },
       },
@@ -166,6 +166,7 @@ test("ThreeTierStack Synthesizes Correctly", () => {
   template.hasResourceProperties("AWS::Logs::LogGroup", {
     LogGroupName: "/ecs/dev/AppExecAudit",
     RetentionInDays: 30,
+    KmsKeyId: Match.anyValue(),
   });
 
   // Task Roleに必要な SSM および Logs 権限ポリシーの付与を検証
@@ -194,6 +195,29 @@ test("ThreeTierStack Synthesizes Correctly", () => {
         }),
       ]),
     }),
+  });
+
+  // KMSキー作成の確認 (dev環境)
+  template.resourceCountIs("AWS::KMS::Key", 1);
+  template.hasResourceProperties("AWS::KMS::Key", {
+    EnableKeyRotation: false,
+  });
+
+  // DatabaseCluster が KMS 暗号化されていることを確認
+  template.hasResourceProperties("AWS::RDS::DBCluster", {
+    StorageEncrypted: true,
+    KmsKeyId: Match.anyValue(),
+  });
+
+  // Secrets Manager が KMS 暗号化されていることを確認
+  template.hasResourceProperties("AWS::SecretsManager::Secret", {
+    KmsKeyId: Match.anyValue(),
+  });
+
+  // AppContainer ロググループも KMS 暗号化されていることを確認
+  template.hasResourceProperties("AWS::Logs::LogGroup", {
+    LogGroupName: "/ecs/dev/AppContainer",
+    KmsKeyId: Match.anyValue(),
   });
 });
 
@@ -253,6 +277,30 @@ test("ThreeTierStack - Staging Environment Synthesizes Correctly", () => {
   template.hasResourceProperties("AWS::Logs::LogGroup", {
     LogGroupName: "/ecs/stg/AppExecAudit",
     RetentionInDays: 30,
+    KmsKeyId: Match.anyValue(),
+  });
+
+  // KMSキー作成の確認 (stg環境)
+  template.resourceCountIs("AWS::KMS::Key", 1);
+  template.hasResourceProperties("AWS::KMS::Key", {
+    EnableKeyRotation: false,
+  });
+
+  // DatabaseCluster が KMS 暗号化されていることを確認
+  template.hasResourceProperties("AWS::RDS::DBCluster", {
+    StorageEncrypted: true,
+    KmsKeyId: Match.anyValue(),
+  });
+
+  // Secrets Manager が KMS 暗号化されていることを確認
+  template.hasResourceProperties("AWS::SecretsManager::Secret", {
+    KmsKeyId: Match.anyValue(),
+  });
+
+  // AppContainer ロググループも KMS 暗号化されていることを確認
+  template.hasResourceProperties("AWS::Logs::LogGroup", {
+    LogGroupName: "/ecs/stg/AppContainer",
+    KmsKeyId: Match.anyValue(),
   });
 });
 
@@ -351,6 +399,30 @@ test("ThreeTierStack - Production Environment Synthesizes Correctly", () => {
   template.hasResourceProperties("AWS::Logs::LogGroup", {
     LogGroupName: "/ecs/prod/AppExecAudit",
     RetentionInDays: 30,
+    KmsKeyId: Match.anyValue(),
+  });
+
+  // KMSキー作成の確認 (prod環境ではキーローテーションが有効)
+  template.resourceCountIs("AWS::KMS::Key", 1);
+  template.hasResourceProperties("AWS::KMS::Key", {
+    EnableKeyRotation: true,
+  });
+
+  // DatabaseCluster が KMS 暗号化されていることを確認
+  template.hasResourceProperties("AWS::RDS::DBCluster", {
+    StorageEncrypted: true,
+    KmsKeyId: Match.anyValue(),
+  });
+
+  // Secrets Manager が KMS 暗号化されていることを確認
+  template.hasResourceProperties("AWS::SecretsManager::Secret", {
+    KmsKeyId: Match.anyValue(),
+  });
+
+  // AppContainer ロググループも KMS 暗号化されていることを確認
+  template.hasResourceProperties("AWS::Logs::LogGroup", {
+    LogGroupName: "/ecs/prod/AppContainer",
+    KmsKeyId: Match.anyValue(),
   });
 });
 
