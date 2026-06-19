@@ -119,11 +119,13 @@ graph TD
   - `main.ts` - CDKTFスタック生成エントリ
   - `lib/config/config.ts` - 環境設定抽象化ヘルパー
   - `lib/datadog-stack.ts` - Datadogスタック定義（S3/DynamoDBリモートステート対応）
-  - `lib/monitors/` - 各AWSリソース（ECS/RDS）のDatadogモニター（アラート）定義
+  - `lib/monitors/` - 各AWSリソース（ECS/RDS）のDatadogモニター（アラート）および **SLO（サービスレベル目標）定義**
 - `diagrams/` - 構成図（Architecture Diagram）の格納
-  - `architecture.svg` - **アーキテクチャ図（RDS Proxy 構成版）**
+  - `architecture_v2.svg` - **アーキテクチャ図（RDS Proxy ＋ SRE構成対応版）**
 - `docs/` - 運用ドキュメント・ウォークスルーの格納
   - `walkthrough.md` - **設計・実装履歴ウォークスルー**
+  - `sre/` - **SRE 信頼性ガバナンス設計（ポートフォリオ用）**
+    - [slo-sli.md](file:///c:/Git/learning-ts-concepts/docs/sre/slo-sli.md) - SLO/SLI 策定定義書テンプレート
   - `governance/` - **エンタープライズガバナンス設計ドキュメント（ポートフォリオ用）**
     - [multi-account-design.md](file:///c:/Git/learning-ts-concepts/docs/governance/multi-account-design.md) - マルチアカウント設計方針
     - [security-and-audit.md](file:///c:/Git/learning-ts-concepts/docs/governance/security-and-audit.md) - 監査・セキュリティ基準
