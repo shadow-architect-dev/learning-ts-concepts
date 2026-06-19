@@ -117,8 +117,8 @@ test("ThreeTierStack Synthesizes Correctly", () => {
     ]),
   });
 
-  // Aurora の夜間自動停止用 Lambda と EventBridge ルールが存在することを確認
-  template.resourceCountIs("AWS::Lambda::Function", 1);
+  // Aurora の夜間自動停止用 Lambda と S3 オブジェクト自動削除用のカスタムリソース Lambda が存在することを確認
+  template.resourceCountIs("AWS::Lambda::Function", 2);
   template.resourceCountIs("AWS::Events::Rule", 2);
 
   // dev環境では DBProxy が存在しないこと（追加コスト0）を確認
@@ -219,6 +219,56 @@ test("ThreeTierStack Synthesizes Correctly", () => {
     LogGroupName: "/ecs/dev/AppContainer",
     KmsKeyId: Match.anyValue(),
   });
+
+  // S3静的アセットバケットの検証 (dev環境)
+  template.resourceCountIs("AWS::S3::Bucket", 1);
+  template.hasResourceProperties("AWS::S3::Bucket", {
+    PublicAccessBlockConfiguration: {
+      BlockPublicAcls: true,
+      BlockPublicPolicy: true,
+      IgnorePublicAcls: true,
+      RestrictPublicBuckets: true,
+    },
+    BucketEncryption: {
+      ServerSideEncryptionConfiguration: [
+        {
+          ServerSideEncryptionByDefault: {
+            KMSMasterKeyID: Match.anyValue(),
+            SSEAlgorithm: "aws:kms",
+          },
+        },
+      ],
+    },
+  });
+
+  // CloudFront OAC の検証
+  template.resourceCountIs("AWS::CloudFront::OriginAccessControl", 1);
+
+  // CloudFront Distribution のマルチオリジンおよびキャッシュビヘイビアの検証
+  template.hasResourceProperties("AWS::CloudFront::Distribution", {
+    DistributionConfig: {
+      Origins: Match.arrayWith([
+        Match.objectLike({
+          CustomOriginConfig: Match.objectLike({
+            OriginProtocolPolicy: "http-only",
+          }),
+        }),
+        Match.objectLike({
+          S3OriginConfig: {
+            OriginAccessIdentity: "",
+          },
+          OriginAccessControlId: Match.anyValue(),
+        }),
+      ]),
+      CacheBehaviors: Match.arrayWith([
+        Match.objectLike({
+          PathPattern: "/assets/*",
+          ViewerProtocolPolicy: "redirect-to-https",
+          CachePolicyId: "658327ea-f89d-4fab-a63d-7e88639e58f6",
+        }),
+      ]),
+    },
+  });
 });
 
 test("ThreeTierStack - Staging Environment Synthesizes Correctly", () => {
@@ -245,8 +295,8 @@ test("ThreeTierStack - Staging Environment Synthesizes Correctly", () => {
   // DBInstance が 3 つ（Writer x1, Reader x2）作成されていることを確認
   template.resourceCountIs("AWS::RDS::DBInstance", 3);
 
-  // 夜間一時停止スケジュール（dev専用）が存在しないことを確認
-  template.resourceCountIs("AWS::Lambda::Function", 0);
+  // 夜間一時停止スケジュール（dev専用）は存在しないが、S3アセット自動削除用のカスタムリソース Lambda が存在することを確認
+  template.resourceCountIs("AWS::Lambda::Function", 1);
   template.resourceCountIs("AWS::Events::Rule", 0);
 
   // ログ集約用の SubscriptionFilter の作成確認
@@ -302,6 +352,20 @@ test("ThreeTierStack - Staging Environment Synthesizes Correctly", () => {
     LogGroupName: "/ecs/stg/AppContainer",
     KmsKeyId: Match.anyValue(),
   });
+
+  // S3静的アセットバケットの検証 (stg環境)
+  template.resourceCountIs("AWS::S3::Bucket", 1);
+  template.hasResourceProperties("AWS::S3::Bucket", {
+    PublicAccessBlockConfiguration: {
+      BlockPublicAcls: true,
+      BlockPublicPolicy: true,
+      IgnorePublicAcls: true,
+      RestrictPublicBuckets: true,
+    },
+  });
+
+  // CloudFront OAC の検証
+  template.resourceCountIs("AWS::CloudFront::OriginAccessControl", 1);
 });
 
 test("ThreeTierStack - Production Environment Synthesizes Correctly", () => {
@@ -424,5 +488,19 @@ test("ThreeTierStack - Production Environment Synthesizes Correctly", () => {
     LogGroupName: "/ecs/prod/AppContainer",
     KmsKeyId: Match.anyValue(),
   });
+
+  // S3静的アセットバケットの検証 (prod環境)
+  template.resourceCountIs("AWS::S3::Bucket", 1);
+  template.hasResourceProperties("AWS::S3::Bucket", {
+    PublicAccessBlockConfiguration: {
+      BlockPublicAcls: true,
+      BlockPublicPolicy: true,
+      IgnorePublicAcls: true,
+      RestrictPublicBuckets: true,
+    },
+  });
+
+  // CloudFront OAC の検証
+  template.resourceCountIs("AWS::CloudFront::OriginAccessControl", 1);
 });
 

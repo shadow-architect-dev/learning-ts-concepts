@@ -8,6 +8,8 @@ import { ComputeConstruct } from "./constructs/compute";
 import { GithubActionsRoleConstruct } from "./constructs/github-role";
 import { CacheConstruct } from "./constructs/cache";
 import { KmsConstruct } from "./constructs/kms";
+import { StorageConstruct } from "./constructs/storage";
+import * as cloudfront_origins from "aws-cdk-lib/aws-cloudfront-origins";
 
 function getSharedOutputs(envName: string) {
   try {
@@ -81,6 +83,11 @@ export class ThreeTierStack extends cdk.Stack {
     const vpcConstruct = new VpcConstruct(this, "VpcConstruct", { envName, vpcCidr });
 
     const kms = new KmsConstruct(this, "KmsConstruct", { envName });
+
+    const storage = new StorageConstruct(this, "StorageConstruct", {
+      envName,
+      kmsKey: kms.kmsKey,
+    });
 
     const cache = new CacheConstruct(this, "CacheConstruct", {
       envName,
@@ -218,9 +225,22 @@ export class ThreeTierStack extends cdk.Stack {
       webAclArn: webAcl.attrArn,
     });
 
-    // 2. Amazon CloudFront Distribution (Origin: ALB)
+    // 2. Amazon CloudFront Distribution (Origin: ALB & S3)
     const cloudfront = cdk.aws_cloudfront;
     const origins = cdk.aws_cloudfront_origins;
+
+    // CloudFront OAC (Origin Access Control) の作成
+    const oac = new cloudfront.CfnOriginAccessControl(this, "S3OAC", {
+      originAccessControlConfig: {
+        name: `S3-OAC-${envName ?? "dev"}-${this.stackName}`,
+        originAccessControlOriginType: "s3",
+        signingBehavior: "always",
+        signingProtocol: "sigv4",
+        description: "Access control for static asset bucket",
+      },
+    });
+
+    const s3Origin = new cloudfront_origins.S3Origin(storage.assetBucket);
 
     const distribution = new cloudfront.Distribution(this, "CloudFrontDistribution", {
       defaultBehavior: {
@@ -234,7 +254,39 @@ export class ThreeTierStack extends cdk.Stack {
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
       },
+      additionalBehaviors: {
+        "/assets/*": {
+          origin: s3Origin,
+          viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+          cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+        },
+      },
     });
+
+    // S3バケットポリシーにて CloudFront (OAC) からの GetObject を許可
+    storage.assetBucket.addToResourcePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        actions: ["s3:GetObject"],
+        resources: [storage.assetBucket.arnForObjects("*")],
+        principals: [new cdk.aws_iam.ServicePrincipal("cloudfront.amazonaws.com")],
+        conditions: {
+          ArnEquals: {
+            "AWS:SourceArn": `arn:aws:cloudfront::${this.account}:distribution/${distribution.distributionId}`,
+          },
+        },
+      })
+    );
+
+    // CfnDistribution (L1) を取得し、S3 オリジンに OAC をバインド
+    const cfnDistribution = distribution.node.defaultChild as cdk.aws_cloudfront.CfnDistribution;
+    cfnDistribution.addPropertyOverride(
+      "DistributionConfig.Origins.1.OriginAccessControlId",
+      oac.attrId
+    );
+    cfnDistribution.addPropertyOverride(
+      "DistributionConfig.Origins.1.S3OriginConfig.OriginAccessIdentity",
+      ""
+    );
 
     // 3. Amazon Route 53 (Optional - only if domainName is provided)
     if (props?.domainName) {

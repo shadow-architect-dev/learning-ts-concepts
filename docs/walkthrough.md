@@ -288,3 +288,26 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 #### 5. [stack.test.ts (CDKアサーションテストの更新)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
 - 各環境のテストケースで、`AWS::KMS::Key` が作成されていること、および `prod` 環境のみ `EnableKeyRotation: true` であることをアサーション検証。
 - DB クラスター、Secrets Manager、CloudWatch Logs ロググループのそれぞれに `KmsKeyId` が設定され、KMS 暗号化が適用されていることをアサーション検証。
+
+## 12. S3 + CloudFront による静的アセットのオリジン分割配信（SRE強化フェーズ 4）
+
+### 変更内容
+
+#### 1. [storage.ts (静的アセットS3バケット定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/storage.ts) [NEW]
+- 静的アセット専用のプライベートな S3 バケット `StaticAssetBucket` を定義。
+- セキュリティ要件に合わせ、KMS カスタマー管理キー (CMK) を用いたデフォルト暗号化を適用。
+- パブリックアクセスの完全ブロック、および SSL 通信の強制 (`enforceSSL: true`) を設定。
+- `dev` / `stg` 環境ではコスト削減と検証の容易化のため、スタック削除時に自動でバケット内のオブジェクトを削除しバケット自体も削除する (`autoDeleteObjects: true`, `removalPolicy: DESTROY`)。
+- `prod` 環境ではデータの永続保護のため `removalPolicy: RETAIN` を設定。
+
+#### 2. [stack.ts (CloudFront & S3 連携)](file:///c:/Git/learning-ts-concepts/infra/lib/stack.ts)
+- CloudFront へのアクセス制限を厳密に行うため、**Origin Access Control (OAC)** を定義 (`CfnOriginAccessControl`)。
+- CloudFront のキャッシュビヘイビア `/assets/*` に対するオリジンとして S3 バケットを登録。
+- パフォーマンスとエッジキャッシュ最適化のため、`/assets/*` に対して `CachingOptimized` キャッシュポリシーを割り当て。
+- S3 側のバケットポリシーに、この CloudFront ディストリビューションからの `s3:GetObject` のみを受け入れるポリシーを自動生成・バインド。
+- CloudFormation (L1) オーバーライド手法により OAC を S3 オリジンへ明示的に紐付け。
+
+#### 3. [stack.test.ts (CDKアサーションテストの更新)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
+- 各環境において、S3 バケットの構築、パブリックブロック設定、KMS 暗号化設定が設計通りに適用されていることをアサーション検証。
+- CloudFront にて ALB と S3 のマルチオリジン構成、`/assets/*` のキャッシュビヘイビア、および OAC によるアクセス制限が正しく適用されているかを検証。
+- `autoDeleteObjects: true` 設定に伴う自動生成 Lambda 数（devで2、stgで1、prodで0）を正確に検証するよう Lambda 個数の期待値をアサーション調整。
