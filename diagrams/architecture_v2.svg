@@ -22,6 +22,9 @@
     <marker id="arrow-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#10b981" />
     </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#e11d48" />
+    </marker>
   </defs>
 
   <style>
@@ -429,6 +432,20 @@
       </g>
     </g>
 
+    <!-- ==================== AWS REGION SERVICES (ElastiCache) ==================== -->
+    <g transform="translate(1120, 455)" filter="url(#shadow)">
+      <rect width="270" height="120" class="card" style="stroke: #e11d48; stroke-width: 1.5;" />
+      <circle cx="28" cy="45" r="14" fill="#e11d48" opacity="0.15" />
+      <rect x="20" y="36" width="16" height="5" rx="1" fill="#e11d48" />
+      <rect x="20" y="43" width="16" height="5" rx="1" fill="#e11d48" />
+      <rect x="20" y="50" width="16" height="5" rx="1" fill="#e11d48" />
+      <text x="52" y="32" class="card-title" fill="#be123c">Amazon ElastiCache (Redis)</text>
+      <text x="52" y="48" class="card-subtitle" font-weight="700">Cluster: CacheConstruct</text>
+      <text x="52" y="60" class="card-subtitle">dev: Single Node (cache.t4g.micro)</text>
+      <text x="52" y="72" class="card-subtitle">stg/prod: Multi-AZ Replication Group</text>
+      <text x="52" y="88" font-size="9" font-weight="600" fill="#e11d48">Port: 6379 (VPC Isolated Subnet)</text>
+    </g>
+
     <!-- ==================== LOG PIPELINE FLOWS ==================== -->
     <!-- ECS Tasks to CloudWatch Logs -->
     <!-- Task A -> CWL -->
@@ -444,5 +461,13 @@
       <text x="0" y="5" font-size="9" font-weight="700" fill="#15803d">Cross-Account Log Delivery</text>
       <text x="0" y="15" font-size="8" fill="#166534">(CfnSubscriptionFilter)</text>
     </g>
+
+    <!-- 8. ECS Tasks to ElastiCache (Redis) Connection -->
+    <path d="M 1055 350 L 1095 350 L 1095 515 L 1120 515" class="flow-line" stroke="#e11d48" stroke-width="2" marker-end="url(#arrow-red)" fill="none" />
+    <g transform="translate(1070, 395)">
+      <rect width="50" height="18" class="port-badge" rx="4" />
+      <text x="25" y="12" class="port-text" font-size="9">TCP :6379</text>
+    </g>
+    <text x="1090" y="338" text-anchor="end" font-size="9" font-weight="700" fill="#be123c">8. Cache Access</text>
   </g>
 </svg>
