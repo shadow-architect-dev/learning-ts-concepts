@@ -196,6 +196,27 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 
 これにより、双方の独立したリポジトリで動作する AI アシスタント（Antigravity）が、本ファイルの変更（プッシュ）をトリガーにして安全に最新のインフラ構築値を引き引き継ぎ・適用できるようになります。
 
+---
+
+## 8. クロスアカウントログ集約（CloudWatch Logs ➔ Kinesis Data Firehose）の実装
+
+管理アカウント/集約アカウントでプロビジョニングされた Kinesis Data Firehose に対し、ECS Fargate のコンテナログ（CloudWatch Logs）からログを自動転送する `SubscriptionFilter` パイプラインを構築しました。
+
+### 変更内容
+
+#### 1. [stack.ts (CDKインフラ定義)](file:///c:/Git/learning-ts-concepts/infra/lib/stack.ts)
+- `shared-outputs.md` のファイルをビルド・合成（synth）時に同期的にパースし、指定環境の `LOG_ARCHIVE_FIREHOSE_ARN` および `LOG_ARCHIVE_DELIVERY_ROLE_ARN` を自動的に抽出するヘルパー関数を実装。
+- トランスパイル後や Jest テスト実行時などのパス変更に対応するため、フォールバック検索（`process.cwd()` を含む3階層）を実装。
+- 抽出した接続情報を `ComputeConstruct` へ引き渡すことで、連携ドキュメントの値がそのままインフラコードへ自動ロードされる仕組みを確立。
+
+#### 2. [compute.ts (ECS Fargate定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/compute.ts)
+- Fargate コンテナログ用に、明示的なロググループ（`aws_logs.LogGroup`）を作成。
+- `logFirehoseArn` と `logDeliveryRoleArn` が渡された場合、このロググループに `SubscriptionFilter` を紐付ける処理を追加。
+
+#### 3. [stack.test.ts (CDKユニットテストの追加)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
+- `dev`, `stg`, `prod` すべての環境スタックのテストケースに、`AWS::Logs::SubscriptionFilter` が 1 つ作成されること、および送信先ストリームARNや配信用ロールARNが `shared-outputs.md` に記載したダミー値（`LogArchiveDeliveryStream` 等）と正しく紐づいていることを検証するアサーションを追加。
+
+
 
 
 

@@ -1,9 +1,52 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
+import * as fs from "fs";
+import * as path from "path";
 import { VpcConstruct } from "./constructs/network";
 import { DatabaseConstruct } from "./constructs/database";
 import { ComputeConstruct } from "./constructs/compute";
 import { GithubActionsRoleConstruct } from "./constructs/github-role";
+
+function getSharedOutputs(envName: string) {
+  try {
+    let filePath = path.join(__dirname, "../../docs/governance/shared-outputs.md");
+    if (!fs.existsSync(filePath)) {
+      filePath = path.join(__dirname, "../../../docs/governance/shared-outputs.md");
+    }
+    if (!fs.existsSync(filePath)) {
+      filePath = path.join(process.cwd(), "../docs/governance/shared-outputs.md");
+    }
+    if (!fs.existsSync(filePath)) {
+      console.warn("Warning: shared-outputs.md not found at any path.");
+      return { firehoseArn: undefined, roleArn: undefined };
+    }
+    const content = fs.readFileSync(filePath, "utf-8");
+    
+    // Split sections to extract corresponding env block
+    const sections = content.split(/### \d+\./);
+    let targetSection = "";
+    
+    if (envName === "dev") {
+      targetSection = sections.find(s => s.includes("開発環境")) || "";
+    } else if (envName === "stg") {
+      targetSection = sections.find(s => s.includes("検証環境")) || "";
+    } else if (envName === "prod") {
+      targetSection = sections.find(s => s.includes("本番環境")) || "";
+    }
+    
+    const firehoseMatch = targetSection.match(/LOG_ARCHIVE_FIREHOSE_ARN(?:\*\*)?\s*\|\s*`([^`]+)`/);
+    const roleMatch = targetSection.match(/LOG_ARCHIVE_DELIVERY_ROLE_ARN(?:\*\*)?\s*\|\s*`([^`]+)`/);
+    
+    const firehoseArn = firehoseMatch && !firehoseMatch[1].includes("未設定") ? firehoseMatch[1] : undefined;
+    const roleArn = roleMatch && !roleMatch[1].includes("未設定") ? roleMatch[1] : undefined;
+    
+    return { firehoseArn, roleArn };
+  } catch (err) {
+    console.warn("Warning: Failed to read shared-outputs.md:", err);
+    return { firehoseArn: undefined, roleArn: undefined };
+  }
+}
+
 
 export interface ThreeTierStackProps extends cdk.StackProps {
   /** EC2 instance size or similar identifier used by the application layer */
@@ -47,6 +90,8 @@ export class ThreeTierStack extends cdk.Stack {
       ? db.proxy.endpoint 
       : db.cluster.clusterEndpoint.hostname;
 
+    const { firehoseArn, roleArn } = getSharedOutputs(envName ?? "dev");
+
     const compute = new ComputeConstruct(this, "ComputeConstruct", {
       instanceSize,
       envName,
@@ -55,6 +100,8 @@ export class ThreeTierStack extends cdk.Stack {
       dbSecurityGroup: vpcConstruct.dbSecurityGroup,
       dbSecret: db.secret,
       dbHost: dbHost,
+      logFirehoseArn: firehoseArn,
+      logDeliveryRoleArn: roleArn,
     });
 
     // GitHub Actions用 IAM ロールの作成（環境ごとにブランチを分離して最小権限を適用）

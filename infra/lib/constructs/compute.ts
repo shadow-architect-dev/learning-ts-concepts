@@ -13,6 +13,8 @@ export interface ComputeConstructProps {
   dbSecurityGroup?: cdk.aws_ec2.ISecurityGroup;
   dbSecret?: cdk.aws_secretsmanager.ISecret;
   dbHost?: string;
+  logFirehoseArn?: string;
+  logDeliveryRoleArn?: string;
 }
 
 export class ComputeConstruct extends Construct {
@@ -73,9 +75,19 @@ export class ComputeConstruct extends Construct {
       containerSecrets.DB_PASSWORD = ecs.Secret.fromSecretsManager(props.dbSecret, "password");
     }
 
+    // 明示的なロググループの定義（サブスクリプションフィルター登録用）
+    const appLogGroup = new cdk.aws_logs.LogGroup(this, "AppLogGroup", {
+      logGroupName: `/ecs/${props.envName ?? "dev"}/AppContainer`,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      retention: cdk.aws_logs.RetentionDays.ONE_WEEK,
+    });
+
     const container = taskDef.addContainer("AppContainer", {
       image: containerImage,
-      logging: ecs.LogDrivers.awsLogs({ streamPrefix: "app" }),
+      logging: ecs.LogDrivers.awsLogs({
+        logGroup: appLogGroup,
+        streamPrefix: "app",
+      }),
       environment: {
         ENV: props.envName ?? "dev",
         DB_HOST: props.dbHost ?? "",
@@ -84,6 +96,22 @@ export class ComputeConstruct extends Construct {
       },
       secrets: containerSecrets,
     });
+
+    // 集約アカウントへのログ転送（SubscriptionFilter）の設定
+    if (props.logFirehoseArn && props.logDeliveryRoleArn) {
+      const deliveryRole = cdk.aws_iam.Role.fromRoleArn(this, "LogDeliveryRole", props.logDeliveryRoleArn);
+      
+      new cdk.aws_logs.SubscriptionFilter(this, "LogArchiveSubscriptionFilter", {
+        logGroup: appLogGroup,
+        destination: {
+          bind: () => ({
+            arn: props.logFirehoseArn!,
+            role: deliveryRole,
+          }),
+        },
+        filterPattern: cdk.aws_logs.FilterPattern.allEvents(),
+      });
+    }
     container.addPortMappings({ containerPort: 8080 });
 
     const ddAgentContainer = taskDef.addContainer("DatadogAgent", {

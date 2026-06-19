@@ -118,6 +118,14 @@ test("ThreeTierStack Synthesizes Correctly", () => {
 
   // dev環境では DBInstance が 1つ（Writer のみ、Reader なし）であることを確認
   template.resourceCountIs("AWS::RDS::DBInstance", 1);
+
+  // ログ集約用の SubscriptionFilter の作成確認
+  template.resourceCountIs("AWS::Logs::SubscriptionFilter", 1);
+  template.hasResourceProperties("AWS::Logs::SubscriptionFilter", {
+    DestinationArn: "arn:aws:firehose:ap-northeast-1:222222222222:deliverystream/LogArchiveDeliveryStream",
+    RoleArn: "arn:aws:iam::222222222222:role/CrossAccountLogsDeliveryRole",
+    FilterPattern: "",
+  });
 });
 
 test("ThreeTierStack - Staging Environment Synthesizes Correctly", () => {
@@ -147,6 +155,14 @@ test("ThreeTierStack - Staging Environment Synthesizes Correctly", () => {
   // 夜間一時停止スケジュール（dev専用）が存在しないことを確認
   template.resourceCountIs("AWS::Lambda::Function", 0);
   template.resourceCountIs("AWS::Events::Rule", 0);
+
+  // ログ集約用の SubscriptionFilter の作成確認
+  template.resourceCountIs("AWS::Logs::SubscriptionFilter", 1);
+  template.hasResourceProperties("AWS::Logs::SubscriptionFilter", {
+    DestinationArn: "arn:aws:firehose:ap-northeast-1:222222222222:deliverystream/LogArchiveDeliveryStream",
+    RoleArn: "arn:aws:iam::222222222222:role/CrossAccountLogsDeliveryRole",
+    FilterPattern: "",
+  });
 });
 
 test("ThreeTierStack - Production Environment Synthesizes Correctly", () => {
@@ -215,5 +231,13 @@ test("ThreeTierStack - Production Environment Synthesizes Correctly", () => {
   // 夜間一時停止スケジュール（dev専用）が存在しないことを確認
   template.resourceCountIs("AWS::Lambda::Function", 0);
   template.resourceCountIs("AWS::Events::Rule", 0);
+
+  // ログ集約用の SubscriptionFilter の作成確認
+  template.resourceCountIs("AWS::Logs::SubscriptionFilter", 1);
+  template.hasResourceProperties("AWS::Logs::SubscriptionFilter", {
+    DestinationArn: "arn:aws:firehose:ap-northeast-1:222222222222:deliverystream/LogArchiveDeliveryStream",
+    RoleArn: "arn:aws:iam::222222222222:role/CrossAccountLogsDeliveryRole",
+    FilterPattern: "",
+  });
 });
 
