@@ -66,6 +66,16 @@ export class DatabaseConstruct extends Construct {
         securityGroups: props.dbSecurityGroup ? [props.dbSecurityGroup] : undefined,
         requireTLS: false, // テスト・接続のしやすさを優先
       });
+
+      // Secrets Manager 自動ローテーション設定 of 追加
+      new secrets.SecretRotation(this, "DbSecretRotation", {
+        secret: this.secret,
+        target: this.cluster,
+        application: secrets.SecretRotationApplication.MYSQL_ROTATION_SINGLE_USER,
+        vpc: props.vpc,
+        vpcSubnets: { subnetType: cdk.aws_ec2.SubnetType.PRIVATE_WITH_EGRESS },
+        automaticallyAfter: cdk.Duration.days(30),
+      });
     }
   }
 }

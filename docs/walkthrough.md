@@ -311,3 +311,23 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 - 各環境において、S3 バケットの構築、パブリックブロック設定、KMS 暗号化設定が設計通りに適用されていることをアサーション検証。
 - CloudFront にて ALB と S3 のマルチオリジン構成、`/assets/*` のキャッシュビヘイビア、および OAC によるアクセス制限が正しく適用されているかを検証。
 - `autoDeleteObjects: true` 設定に伴う自動生成 Lambda 数（devで2、stgで1、prodで0）を正確に検証するよう Lambda 個数の期待値をアサーション調整。
+
+---
+
+## 13. Secrets Manager 認証情報の Lambda 自動ローテーション（SRE強化フェーズ 5）
+
+### 変更内容
+
+#### 1. [database.ts (RDS & シークレット定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/database.ts)
+- `stg` / `prod` 環境において、RDS クラスター接続用の Secrets Manager シークレットに `SecretRotation` をアタッチ。
+- 標準提供されているシングルユーザー用ローテーションテンプレート `MYSQL_ROTATION_SINGLE_USER` を使用。
+- ローテーション期間を 30 日（`cdk.Duration.days(30)`）に設定。
+- ローテーション Lambda はデータベースと同じ VPC 内のプライベートサブネット (`PRIVATE_WITH_EGRESS`) に配置。
+- ローテーション Lambda 用セキュリティグループから RDS (3306ポート) への疎通を許可するインバウンド通信ルールを自動で DB セキュリティグループに適用。
+- `dev` 環境では `SecretRotation` の構築を完全にバイパスし、無駄なリソース作成とコストを回避。
+
+#### 2. [stack.test.ts (CDKアサーションテスト of 更新)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
+- `dev` 環境にて `AWS::SecretsManager::RotationSchedule` が 0 件であることを検証。
+- `stg` / `prod` 環境にて `AWS::SecretsManager::RotationSchedule` が 1 件作成されていることをアサーション検証。
+- 環境ごとのローテーション Lambda 作成（サーバーレスアプリケーションテンプレート経由）に配慮しつつ、各環境でプロビジョニングされる Lambda 個数の期待値（dev: 2、stg: 1、prod: 0）が正しいことを検証。
+

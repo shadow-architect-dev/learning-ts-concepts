@@ -269,6 +269,9 @@ test("ThreeTierStack Synthesizes Correctly", () => {
       ]),
     },
   });
+
+  // dev環境では Secrets Manager の自動ローテーションは設定されないことを確認
+  template.resourceCountIs("AWS::SecretsManager::RotationSchedule", 0);
 });
 
 test("ThreeTierStack - Staging Environment Synthesizes Correctly", () => {
@@ -366,6 +369,9 @@ test("ThreeTierStack - Staging Environment Synthesizes Correctly", () => {
 
   // CloudFront OAC の検証
   template.resourceCountIs("AWS::CloudFront::OriginAccessControl", 1);
+
+  // Secrets Manager の自動ローテーションが設定されていることを確認
+  template.resourceCountIs("AWS::SecretsManager::RotationSchedule", 1);
 });
 
 test("ThreeTierStack - Production Environment Synthesizes Correctly", () => {
@@ -502,5 +508,8 @@ test("ThreeTierStack - Production Environment Synthesizes Correctly", () => {
 
   // CloudFront OAC の検証
   template.resourceCountIs("AWS::CloudFront::OriginAccessControl", 1);
+
+  // Secrets Manager の自動ローテーションが設定されていることを確認
+  template.resourceCountIs("AWS::SecretsManager::RotationSchedule", 1);
 });
 
