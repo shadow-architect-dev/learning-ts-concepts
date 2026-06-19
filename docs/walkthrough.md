@@ -211,7 +211,7 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 
 #### 2. [compute.ts (ECS Fargate定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/compute.ts)
 - Fargate コンテナログ用に、明示的なロググループ（`aws_logs.LogGroup`）を作成。
-- `logFirehoseArn` と `logDeliveryRoleArn` が渡された場合、このロググループに `SubscriptionFilter` を紐付ける処理を追加。
+- クロスアカウントの Kinesis Firehose へのログ配信におけるバインディングエラーを回避するため、L2 リソースではなく L1 リソースの `aws_logs.CfnSubscriptionFilter` を使用して、指定された Firehose ARN と配信ロールの ARN をロググループに直接紐付ける処理を実装。
 
 #### 3. [stack.test.ts (CDKユニットテストの追加)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
 - `dev`, `stg`, `prod` すべての環境スタックのテストケースに、`AWS::Logs::SubscriptionFilter` が 1 つ作成されること、および送信先ストリームARNや配信用ロールARNが `shared-outputs.md` に記載したダミー値（`LogArchiveDeliveryStream` 等）と正しく紐づいていることを検証するアサーションを追加。

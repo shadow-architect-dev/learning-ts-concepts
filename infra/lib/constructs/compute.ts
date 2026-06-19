@@ -97,19 +97,13 @@ export class ComputeConstruct extends Construct {
       secrets: containerSecrets,
     });
 
-    // 集約アカウントへのログ転送（SubscriptionFilter）の設定
+    // 集約アカウントへのログ転送（CfnSubscriptionFilter）の設定
     if (props.logFirehoseArn && props.logDeliveryRoleArn) {
-      const deliveryRole = cdk.aws_iam.Role.fromRoleArn(this, "LogDeliveryRole", props.logDeliveryRoleArn);
-      
-      new cdk.aws_logs.SubscriptionFilter(this, "LogArchiveSubscriptionFilter", {
-        logGroup: appLogGroup,
-        destination: {
-          bind: () => ({
-            arn: props.logFirehoseArn!,
-            role: deliveryRole,
-          }),
-        },
-        filterPattern: cdk.aws_logs.FilterPattern.allEvents(),
+      new cdk.aws_logs.CfnSubscriptionFilter(this, "LogArchiveSubscriptionFilter", {
+        logGroupName: appLogGroup.logGroupName,
+        filterPattern: cdk.aws_logs.FilterPattern.allEvents().logPatternString,
+        destinationArn: props.logFirehoseArn!,
+        roleArn: props.logDeliveryRoleArn!,
       });
     }
     container.addPortMappings({ containerPort: 8080 });
