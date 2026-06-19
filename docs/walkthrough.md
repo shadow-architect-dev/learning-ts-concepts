@@ -220,3 +220,29 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 
 
 
+
+## 9. AWS ElastiCache (Redis) の環境別導入（SRE強化フェーズ 1）
+
+環境間パリティを維持しつつ開発コストを抑えるため、環境別にトポロジーを動的に切り替える ElastiCache (Redis) キャッシュレイヤーを構築しました。
+
+### 変更内容
+
+#### 1. [cache.ts (キャッシュ定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/cache.ts) [NEW]
+- `CacheConstruct` を新規作成し、VPCのアイソレーテッドサブネットに配置する Redis サブネットグループを定義。
+- `dev`環境：コスト極小化のため、レプリカなし・マルチAZ無効のシングルノード（`CfnCacheCluster`）で構築（`cache.t4g.micro`）。
+- `stg` / `prod`環境：高可用性を担保するため、プライマリ1＋レプリカ1のマルチAZ構成・自動フェイルオーバー有効のレプリケーションクラスター（`CfnReplicationGroup`）で構築（`cache.t4g.micro`）。
+
+#### 2. [network.ts (ネットワーク定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/network.ts)
+- Redis 専用のセキュリティグループ `redisSecurityGroup` を追加。
+- ECSタスク用セキュリティグループ `ecsSecurityGroup` からの Port 6379 接続のみを許可するインバウンドルールを定義。
+
+#### 3. [stack.ts (CDKスタック統合)](file:///c:/Git/learning-ts-concepts/infra/lib/stack.ts)
+- `CacheConstruct` をインスタンス化し、作成された Redis のエンドポイントアドレスを `ComputeConstruct` へ引き渡す。
+
+#### 4. [compute.ts (ECS Fargate定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/compute.ts)
+- ECSの `AppContainer` の環境変数として `REDIS_HOST` および `REDIS_PORT` をインジェクションし、アプリケーションから透過的に接続可能な構成を実装。
+
+#### 5. [stack.test.ts (CDKアサーションテストの更新)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
+- `dev`環境：`AWS::ElastiCache::CacheCluster` （NumCacheNodes: 1）が作成されていることの検証を追加。
+- `stg`/`prod`環境：`AWS::ElastiCache::ReplicationGroup` （NumCacheClusters: 2、MultiAZ/Failover 有効）が作成されていることの検証を追加。
+- `AppContainer` の環境変数に `REDIS_HOST`/`REDIS_PORT` が正しくセットされていることのアサーションを追加。
