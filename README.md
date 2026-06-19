@@ -77,6 +77,7 @@
     - [multi-account-design.md](file:///c:/Git/learning-ts-concepts/docs/governance/multi-account-design.md) - マルチアカウント設計方針
     - [security-and-audit.md](file:///c:/Git/learning-ts-concepts/docs/governance/security-and-audit.md) - 監査・セキュリティ基準
     - [cost-management.md](file:///c:/Git/learning-ts-concepts/docs/governance/cost-management.md) - コスト管理・財務ガバナンス方針
+    - [shared-outputs.md](file:///c:/Git/learning-ts-concepts/docs/governance/shared-outputs.md) - **リポジトリ間連携用インターフェース仕様書（★AI連携用）**
 - `app/` - アプリケーションコード
   - `Dockerfile` - Nginxコンテナ定義（**セキュリティ自動パッチ機能付き**）
   - `index.html` - 静的デモ画面

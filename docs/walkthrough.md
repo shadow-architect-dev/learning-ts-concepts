@@ -188,5 +188,14 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 - `npm run compile`（TypeScriptコンパイル）が正常に完了することを確認。
 - `npx cdktf synth` による Terraform JSON 合成が正常に完了することを確認。
 
+---
+
+## 7. リポジトリ間連携用インターフェース（shared-outputs.md）の追加
+
+ドキュメント駆動によるマルチリポジトリ（`aws-landing-zone` との）連携を実現するため、OIDCデプロイロールARNやアカウントIDなどの変数を定義・同期するためのインターフェース仕様書 [shared-outputs.md](file:///c:/Git/learning-ts-concepts/docs/governance/shared-outputs.md) を追加しました。
+
+これにより、双方の独立したリポジトリで動作する AI アシスタント（Antigravity）が、本ファイルの変更（プッシュ）をトリガーにして安全に最新のインフラ構築値を引き引き継ぎ・適用できるようになります。
+
+
 
 
