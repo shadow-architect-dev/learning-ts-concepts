@@ -18,6 +18,8 @@
 | **ECR Repository URI** | `【未設定】` (例: `123.dkr.ecr.ap-northeast-1.amazonaws.com/app-repo-dev`) | `.github/workflows/deploy.yml` (ECR_REPO) |
 | **CDKTF S3 Bucket** | `【未設定】` (例: `dd-state-bucket-dev`) | `.github/workflows/datadog.yml` (TERRAFORM_STATE_BUCKET) |
 | **CDKTF DynamoDB Table**| `【未設定】` (例: `dd-lock-table-dev`) | `.github/workflows/datadog.yml` (TERRAFORM_LOCK_TABLE) |
+| **LOG_ARCHIVE_FIREHOSE_ARN** | `arn:aws:firehose:ap-northeast-1:222222222222:deliverystream/LogArchiveDeliveryStream` | CloudWatch Logs配信先のFirehoseストリームARN |
+| **LOG_ARCHIVE_DELIVERY_ROLE_ARN** | `arn:aws:iam::222222222222:role/CrossAccountLogsDeliveryRole` | CloudWatch LogsがFirehoseへ送信する際に利用するロールARN |
 
 ### 2. 検証環境 (Staging)
 | パラメータ名 | 設定値 | 利用先（本リポジトリ） |
@@ -27,6 +29,8 @@
 | **ECR Repository URI** | `【未設定】` | `.github/workflows/deploy.yml` (ECR_REPO) |
 | **CDKTF S3 Bucket** | `【未設定】` | `.github/workflows/datadog.yml` (TERRAFORM_STATE_BUCKET) |
 | **CDKTF DynamoDB Table**| `【未設定】` | `.github/workflows/datadog.yml` (TERRAFORM_LOCK_TABLE) |
+| **LOG_ARCHIVE_FIREHOSE_ARN** | `arn:aws:firehose:ap-northeast-1:222222222222:deliverystream/LogArchiveDeliveryStream` | CloudWatch Logs配信先のFirehoseストリームARN |
+| **LOG_ARCHIVE_DELIVERY_ROLE_ARN** | `arn:aws:iam::222222222222:role/CrossAccountLogsDeliveryRole` | CloudWatch LogsがFirehoseへ送信する際に利用するロールARN |
 
 ### 3. 本番環境 (Production)
 | パラメータ名 | 設定値 | 利用先（本リポジトリ） |
@@ -36,6 +40,8 @@
 | **ECR Repository URI** | `【未設定】` | `.github/workflows/deploy.yml` (ECR_REPO) |
 | **CDKTF S3 Bucket** | `【未設定】` | `.github/workflows/datadog.yml` (TERRAFORM_STATE_BUCKET) |
 | **CDKTF DynamoDB Table**| `【未設定】` | `.github/workflows/datadog.yml` (TERRAFORM_LOCK_TABLE) |
+| **LOG_ARCHIVE_FIREHOSE_ARN** | `arn:aws:firehose:ap-northeast-1:222222222222:deliverystream/LogArchiveDeliveryStream` | CloudWatch Logs配信先のFirehoseストリームARN |
+| **LOG_ARCHIVE_DELIVERY_ROLE_ARN** | `arn:aws:iam::222222222222:role/CrossAccountLogsDeliveryRole` | CloudWatch LogsがFirehoseへ送信する際に利用するロールARN |
 
 ---
 
