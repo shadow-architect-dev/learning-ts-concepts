@@ -48,13 +48,55 @@ export class ComputeConstruct extends Construct {
       imageScanOnPush: true, // セキュリティ向上のためイメージスキャンを有効化
     });
 
-    const cluster = new ecs.Cluster(this, "EcsCluster", { vpc: props.vpc });
+    // 操作履歴を保存する監査用ロググループ
+    const execAuditLogGroup = new cdk.aws_logs.LogGroup(this, "EcsExecAuditLogGroup", {
+      logGroupName: `/ecs/${props.envName ?? "dev"}/AppExecAudit`,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      retention: cdk.aws_logs.RetentionDays.ONE_MONTH,
+    });
+
+    const cluster = new ecs.Cluster(this, "EcsCluster", {
+      vpc: props.vpc,
+      executeCommandConfiguration: {
+        logConfiguration: {
+          cloudWatchLogGroup: execAuditLogGroup,
+          cloudWatchEncryptionEnabled: false,
+        },
+        logging: ecs.ExecuteCommandLogging.OVERRIDE,
+      },
+    });
     this.cluster = cluster;
 
     const taskDef = new ecs.FargateTaskDefinition(this, "TaskDef", {
       cpu: spec.cpu,
       memoryLimitMiB: spec.memoryMiB,
     });
+
+    // ECS Exec (AWS SSM) に必要な IAM 権限の付与 (Task Role に対して)
+    taskDef.addToTaskRolePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        actions: [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel",
+        ],
+        resources: ["*"],
+      })
+    );
+
+    // 監査ロググループへの書き込み権限の付与
+    taskDef.addToTaskRolePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        actions: [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+        ],
+        resources: [execAuditLogGroup.logGroupArn],
+      })
+    );
 
     // Datadog API キー用のシークレット（ダミーのARNを参照）
     // ※ 実際にデプロイする際はSecrets Managerに実キーを登録し、そのARNに差し替えてください。
@@ -145,6 +187,9 @@ export class ComputeConstruct extends Construct {
     const natGateways = natGatewaysContext !== undefined ? Number(natGatewaysContext) : 1;
     const isPublicSubnet = natGateways === 0;
 
+    // prod環境では ECS Exec を無効化し、それ以外（dev/stg）ではデバッグのために有効化
+    const enableExec = props.envName !== "prod";
+
     const service = new ecs.FargateService(this, "FargateService", {
       cluster,
       taskDefinition: taskDef,
@@ -155,6 +200,7 @@ export class ComputeConstruct extends Construct {
         : { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       circuitBreaker: { rollback: true },
       minHealthyPercent: 100,
+      enableExecuteCommand: enableExec,
     });
 
     this.service = service;

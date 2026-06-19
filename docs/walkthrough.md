@@ -246,3 +246,19 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 - `dev`環境：`AWS::ElastiCache::CacheCluster` （NumCacheNodes: 1）が作成されていることの検証を追加。
 - `stg`/`prod`環境：`AWS::ElastiCache::ReplicationGroup` （NumCacheClusters: 2、MultiAZ/Failover 有効）が作成されていることの検証を追加。
 - `AppContainer` の環境変数に `REDIS_HOST`/`REDIS_PORT` が正しくセットされていることのアサーションを追加。
+
+## 10. ECS Exec (AWS SSM) の環境別有効化と監査ロギング（SRE強化フェーズ 2）
+
+コンテナへの安全なリモートデバッグ環境を提供する ECS Exec を導入し、SREとしてのセキュリティガバナンス設計（本番環境での無効化・監査ロギングの自動化）を実装しました。
+
+### 変更内容
+
+#### 1. [compute.ts (ECS Fargate定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/compute.ts)
+- 専用の監査ログ保存用 CloudWatch Logs ロググループ `EcsExecAuditLogGroup` (`/ecs/env/AppExecAudit`) を作成。
+- ECSタスク定義の Task Role に対し、コンテナ内 SSM Agent が AWS SSM サービスと通信するための最小権限ポリシー（`ssmmessages:CreateControlChannel` 等）および監査ログ書き込み権限ポリシーをアタッチ。
+- ECS Cluster 側の `executeCommandConfiguration` で、すべての操作セッション履歴を `EcsExecAuditLogGroup` へロギング保存する設定をオーバーライド適用。
+- `FargateService` で `enableExecuteCommand` を環境パラメータ（`dev`/`stg` は `true` で開発デバッグを許可、`prod` は `false` で本番への侵入防止を強制）に基づいて動的にスイッチする設計を実装。
+
+#### 2. [stack.test.ts (CDKアサーションテストの更新)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
+- `dev` / `stg`環境テスト：`AWS::ECS::Service` の `EnableExecuteCommand` が `true` であること、監査ロググループが作成されていること、および Task Role に対し SSM/Logs 操作権限ポリシーが正しく設定されていることをアサーション検証。
+- `prod`環境テスト：`AWS::ECS::Service` の `EnableExecuteCommand` が `false` であることの検証を追加。

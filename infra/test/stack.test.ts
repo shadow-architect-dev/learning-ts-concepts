@@ -143,6 +143,58 @@ test("ThreeTierStack Synthesizes Correctly", () => {
     NumCacheNodes: 1,
   });
   template.resourceCountIs("AWS::ElastiCache::SubnetGroup", 1);
+
+  // ECS Exec 有効化の検証 (dev環境では true)
+  template.hasResourceProperties("AWS::ECS::Service", {
+    EnableExecuteCommand: true,
+  });
+
+  // ECS Cluster の executeCommandConfiguration 設定の検証
+  template.hasResourceProperties("AWS::ECS::Cluster", {
+    Configuration: {
+      ExecuteCommandConfiguration: {
+        Logging: "OVERRIDE",
+        LogConfiguration: {
+          CloudWatchEncryptionEnabled: false,
+          CloudWatchLogGroupName: Match.anyValue(),
+        },
+      },
+    },
+  });
+
+  // 監査ログ用ロググループの検証
+  template.hasResourceProperties("AWS::Logs::LogGroup", {
+    LogGroupName: "/ecs/dev/AppExecAudit",
+    RetentionInDays: 30,
+  });
+
+  // Task Roleに必要な SSM および Logs 権限ポリシーの付与を検証
+  template.hasResourceProperties("AWS::IAM::Policy", {
+    PolicyDocument: Match.objectLike({
+      Statement: Match.arrayWith([
+        Match.objectLike({
+          Action: [
+            "ssmmessages:CreateControlChannel",
+            "ssmmessages:CreateDataChannel",
+            "ssmmessages:OpenControlChannel",
+            "ssmmessages:OpenDataChannel",
+          ],
+          Effect: "Allow",
+          Resource: "*",
+        }),
+        Match.objectLike({
+          Action: [
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+            "logs:DescribeLogGroups",
+            "logs:DescribeLogStreams",
+          ],
+          Effect: "Allow",
+          Resource: Match.anyValue(),
+        }),
+      ]),
+    }),
+  });
 });
 
 test("ThreeTierStack - Staging Environment Synthesizes Correctly", () => {
@@ -191,6 +243,17 @@ test("ThreeTierStack - Staging Environment Synthesizes Correctly", () => {
     NumCacheClusters: 2,
   });
   template.resourceCountIs("AWS::ElastiCache::SubnetGroup", 1);
+
+  // ECS Exec 有効化の検証 (stg環境では true)
+  template.hasResourceProperties("AWS::ECS::Service", {
+    EnableExecuteCommand: true,
+  });
+
+  // 監査ログ用ロググループの検証
+  template.hasResourceProperties("AWS::Logs::LogGroup", {
+    LogGroupName: "/ecs/stg/AppExecAudit",
+    RetentionInDays: 30,
+  });
 });
 
 test("ThreeTierStack - Production Environment Synthesizes Correctly", () => {
@@ -278,5 +341,16 @@ test("ThreeTierStack - Production Environment Synthesizes Correctly", () => {
     NumCacheClusters: 2,
   });
   template.resourceCountIs("AWS::ElastiCache::SubnetGroup", 1);
+
+  // ECS Exec 有効化の検証 (prod環境では false)
+  template.hasResourceProperties("AWS::ECS::Service", {
+    EnableExecuteCommand: false,
+  });
+
+  // 監査ログ用ロググループの検証
+  template.hasResourceProperties("AWS::Logs::LogGroup", {
+    LogGroupName: "/ecs/prod/AppExecAudit",
+    RetentionInDays: 30,
+  });
 });
 
