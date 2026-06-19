@@ -24,10 +24,10 @@ export class SloMonitors extends Construct {
       type: "metric",
       description: "Metrics-based SLO evaluating the ratio of non-5xx responses from Application Load Balancer.",
       query: {
-        // 分子: 5xxエラーではない正常系リクエスト
-        numerator: `sum:aws.applicationelb.request_count{environment:${env}}.as_count() - sum:aws.applicationelb.httpcode_elb_5xx{environment:${env}}.as_count()`,
-        // 分母: 総リクエスト数
-        denominator: `sum:aws.applicationelb.request_count{environment:${env}}.as_count()`,
+        // 分子: 総リクエスト数から4xxおよび5xxエラーを除外したもの（＝2xx/3xxの健全リクエスト数）
+        numerator: `sum:aws.applicationelb.request_count{environment:${env}}.as_count() - sum:aws.applicationelb.httpcode_elb_4xx{environment:${env}}.as_count() - sum:aws.applicationelb.httpcode_elb_5xx{environment:${env}}.as_count()`,
+        // 分母: 総リクエスト数から4xxエラー（ユーザー起因エラー）を除外したもの（＝システム本来の評価対象リクエスト数）
+        denominator: `sum:aws.applicationelb.request_count{environment:${env}}.as_count() - sum:aws.applicationelb.httpcode_elb_4xx{environment:${env}}.as_count()`,
       },
       thresholds: [
         {

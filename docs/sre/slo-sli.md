@@ -16,18 +16,18 @@
 ### 1. 可用性 (Availability)
 ユーザーがシステムを健全に利用できる割合を評価します。
 
-| 指標名 (SLI) | 計測方法 (データソース) | サービスレベル目標 (SLO) | 測定期間 | 備考 / 計算式 |
+| 指標名 (SLI) | 計測方法 (データソース) | サービスレベル目標 (SLO) | 測定期間 | 備考 / 計算式 / 運用リンク |
 | :--- | :--- | :--- | :--- | :--- |
-| **API 可用性** | ALB ログ / メトリクス | **99.9%** (エラーバジェット: 0.1%) | 30日間 | `(HTTP status 2xx/3xx/4xx の総数) / (総リクエスト数)` <br>※ 5xx系エラーを不健全と定義 |
-| **静的アセット可用性** | CloudFront メトリクス | **99.99%** (エラーバジェット: 0.01%) | 30日間 | `(CloudFront 送信成功リクエスト数) / (CloudFront 総リクエスト数)` |
+| **API 可用性** | ALB ログ / メトリクス | **99.9%** (エラーバジェット: 0.1%) | **30日間のローリングウィンドウ** (移動平均) | `(HTTP status 2xx/3xx の総数) / (総リクエスト数 - HTTP status 4xx の総数)` <br>※ ユーザー起因のエラー (4xx: Bad Requestや404) を分母・分子の双方から除外し、システム自体の健全性 (5xx率) のみを厳密に評価。 <br>👉 [Datadog SLO Dashboard](https://app.datadoghq.com/dashboard/availability-slo) / [障害対応Runbook](../runbook/troubleshooting-availability.md) |
+| **静的アセット可用性** | CloudFront メトリクス | **99.99%** (エラーバジェット: 0.01%) | **30日間のローリングウィンドウ** (移動平均) | `(CloudFront 送信成功リクエスト数) / (CloudFront 総リクエスト数)` <br>👉 [CloudFront SLO Dashboard](https://app.datadoghq.com/dashboard/cloudfront-slo) / [CF障害対応Runbook](../runbook/troubleshooting-cloudfront.md) |
 
 ### 2. 応答速度 (Latency)
 ユーザーがストレスを感じずに操作できるレスポンス速度を評価します。
 
-| 指標名 (SLI) | 計測方法 (データソース) | サービスレベル目標 (SLO) | 測定期間 | 備考 / 計算式 |
+| 指標名 (SLI) | 計測方法 (データソース) | サービスレベル目標 (SLO) | 測定期間 | 備考 / 計算式 / 運用リンク |
 | :--- | :--- | :--- | :--- | :--- |
-| **API レレスポンス速度 (p95)** | Datadog APM / ALB メトリクス | **95% のリクエストが 500ms 以内** | 30日間 | 応答速度の 95 パーセンタイル値が 500ms 以下である割合 |
-| **API レレスポンス速度 (p99)** | Datadog APM / ALB メトリクス | **99% のリクエストが 1500ms 以内** | 30日間 | 応答速度の 99 パーセンタイル値が 1500ms 以下である割合 |
+| **API レスポンス速度 (p95)** | Datadog APM / ALB メトリクス | **95% のリクエストが 500ms 以内** | **30日間のローリングウィンドウ** (移動平均) | 応答速度の 95 パーセンタイル値が 500ms 以下である割合 <br>👉 [APM Latency Dashboard](https://app.datadoghq.com/apm/services) / [遅延調査Runbook](../runbook/troubleshooting-latency.md) |
+| **API レスポンス速度 (p99)** | Datadog APM / ALB メトリクス | **99% のリクエストが 1500ms 以内** | **30日間のローリングウィンドウ** (移動平均) | 応答速度の 99 パーセンタイル値が 1500ms 以下である割合 <br>👉 [APM Latency Dashboard](https://app.datadoghq.com/apm/services) / [遅延調査Runbook](../runbook/troubleshooting-latency.md) |
 
 ---
 
