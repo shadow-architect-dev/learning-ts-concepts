@@ -20,6 +20,16 @@ test("ThreeTierStack Synthesizes Correctly", () => {
   // VPC が作成されていることを確認
   template.resourceCountIs("AWS::EC2::VPC", 1);
 
+  // DB & Redis セキュリティグループのアウトバウンド制限（Egressルールが不在であること）の検証
+  template.hasResourceProperties("AWS::EC2::SecurityGroup", {
+    GroupDescription: "Security group for Aurora DB (No outbound allowed)",
+    SecurityGroupEgress: Match.absent(),
+  });
+  template.hasResourceProperties("AWS::EC2::SecurityGroup", {
+    GroupDescription: "Security group for ElastiCache Redis (No outbound allowed)",
+    SecurityGroupEgress: Match.absent(),
+  });
+
   // ALB が作成されていることを確認
   template.resourceCountIs("AWS::ElasticLoadBalancingV2::LoadBalancer", 1);
 
@@ -289,6 +299,16 @@ test("ThreeTierStack - Staging Environment Synthesizes Correctly", () => {
 
   const template = Template.fromStack(stack);
 
+  // DB & Redis セキュリティグループのアウトバウンド制限（Egressルールが不在であること）の検証
+  template.hasResourceProperties("AWS::EC2::SecurityGroup", {
+    GroupDescription: "Security group for Aurora DB (No outbound allowed)",
+    SecurityGroupEgress: Match.absent(),
+  });
+  template.hasResourceProperties("AWS::EC2::SecurityGroup", {
+    GroupDescription: "Security group for ElastiCache Redis (No outbound allowed)",
+    SecurityGroupEgress: Match.absent(),
+  });
+
   // DBProxy が作成されていることを確認
   template.resourceCountIs("AWS::RDS::DBProxy", 1);
 
@@ -388,6 +408,16 @@ test("ThreeTierStack - Production Environment Synthesizes Correctly", () => {
   });
 
   const template = Template.fromStack(stack);
+
+  // DB & Redis セキュリティグループのアウトバウンド制限（Egressルールが不在であること）の検証
+  template.hasResourceProperties("AWS::EC2::SecurityGroup", {
+    GroupDescription: "Security group for Aurora DB (No outbound allowed)",
+    SecurityGroupEgress: Match.absent(),
+  });
+  template.hasResourceProperties("AWS::EC2::SecurityGroup", {
+    GroupDescription: "Security group for ElastiCache Redis (No outbound allowed)",
+    SecurityGroupEgress: Match.absent(),
+  });
 
   // DBProxy が作成されていることを確認
   template.resourceCountIs("AWS::RDS::DBProxy", 1);

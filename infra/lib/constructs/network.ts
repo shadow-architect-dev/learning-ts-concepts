@@ -82,13 +82,15 @@ export class VpcConstruct extends Construct {
     // DB用セキュリティグループ
     this.dbSecurityGroup = new ec2.SecurityGroup(this, "DbSecurityGroup", {
       vpc: this.vpc,
-      description: "Security group for Aurora DB",
+      description: "Security group for Aurora DB (No outbound allowed)",
+      allowAllOutbound: false,
     });
 
     // Redis用セキュリティグループ
     this.redisSecurityGroup = new ec2.SecurityGroup(this, "RedisSecurityGroup", {
       vpc: this.vpc,
-      description: "Security group for ElastiCache Redis",
+      description: "Security group for ElastiCache Redis (No outbound allowed)",
+      allowAllOutbound: false,
     });
 
     // ECS → Redis (6379) の通信を許可
