@@ -152,6 +152,7 @@ graph TD
     - [post-mortem-sample.md](file:///c:/Git/learning-ts-concepts/docs/sre/post-mortem-sample.md) - **障害振り返り報告書 (Blameless Post-Mortem) サンプル**
     - [disaster-recovery-policy.md](file:///c:/Git/learning-ts-concepts/docs/sre/disaster-recovery-policy.md) - **災害復旧 (DR) 方針書**
     - [load-testing-plan.md](file:///c:/Git/learning-ts-concepts/docs/sre/load-testing-plan.md) - **負荷テスト ＆ キャパシティプランニング計画書**
+    - [chaos-engineering.md](file:///c:/Git/learning-ts-concepts/docs/sre/chaos-engineering.md) - **カオスエンジニアリング実験計画書**
   - `runbook/` - **障害対応・トラブルシューティング手順書 (Runbook)**
     - [troubleshooting-availability.md](file:///c:/Git/learning-ts-concepts/docs/runbook/troubleshooting-availability.md) - API可用性低下時の一次対応手順
     - [troubleshooting-latency.md](file:///c:/Git/learning-ts-concepts/docs/runbook/troubleshooting-latency.md) - API遅延発生時の一次対応手順
