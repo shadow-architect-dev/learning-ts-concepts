@@ -68,8 +68,28 @@ test("ThreeTierStack Synthesizes Correctly", () => {
   // ALB が作成されていることを確認
   template.resourceCountIs("AWS::ElasticLoadBalancingV2::LoadBalancer", 1);
 
-  // WAF (WebACL) が作成されていることを確認
+  // WAF (WebACL) ＆ IPSet が作成されていることを確認
+  template.resourceCountIs("AWS::WAFv2::IPSet", 1);
   template.resourceCountIs("AWS::WAFv2::WebACL", 1);
+  template.hasResourceProperties("AWS::WAFv2::WebACL", {
+    CustomResponseBodies: {
+      MaintenanceHtml: {
+        ContentType: "TEXT_HTML",
+        Content: Match.stringLikeRegexp(".*ただいまメンテナンス中です.*"),
+      },
+    },
+    Rules: Match.arrayWith([
+      Match.objectLike({
+        Name: "MaintenanceModeRule",
+        Priority: 1,
+        Action: { Count: {} },
+      }),
+      Match.objectLike({
+        Name: "AWSManagedRulesCommonRuleSet",
+        Priority: 2,
+      }),
+    ]),
+  });
 
   // ECS クラスターとサービスが作成されていることを確認
   template.resourceCountIs("AWS::ECS::Cluster", 1);

@@ -377,3 +377,20 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 
 #### 1. [application-deployment.md](file:///c:/Git/learning-ts-concepts/docs/runbook/application-deployment.md)
 - アプリケーションエンジニア向けに、動的コンテナアプリ（ECS Fargate）と静的アセット（S3 + CloudFront）のそれぞれのデプロイ手順（手動コマンド、必要な権限、GitHub ActionsによるCI/CD自動化定義例、および障害時の緊急ロールバック手順）を明文化した手順書を新規作成しました。
+
+---
+
+## 18. AWS WAFv2 を利用したメンテナンスモードの実装と手順書の作成
+
+### 変更内容
+
+#### 1. [stack.ts (CDKインフラ定義)](file:///c:/Git/learning-ts-concepts/infra/lib/stack.ts)
+- AWS WAFv2 (WebACL) に、ホワイトリスト除外IPを管理するための `CfnIPSet` を追加しました。
+- メンテナンスモード中の静的HTML（503レスポンス）を登録する `customResponseBodies` を定義しました。
+- `MaintenanceModeRule` (優先度1) を追加しました。デフォルトで `Action: Count` (通常稼働) に設定されています。
+
+#### 2. [stack.test.ts (CDKアサーションテストの更新)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
+- `CfnIPSet` の存在と、WAF WebACL の `Rules` / `CustomResponseBodies` の構成（`MaintenanceModeRule` の存在確認など）を検証するアサーションを追加しました。
+
+#### 3. [maintenance-mode.md](file:///c:/Git/learning-ts-concepts/docs/runbook/maintenance-mode.md)
+- インフラの再デプロイを伴わない、AWS CLI を用いた瞬時のメンテナンス切り替え（`Count` ➔ `Block` への変更適用）手順、復旧手順、および除外管理者IPの更新手順を定義したランブックを新規作成しました。

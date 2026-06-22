@@ -192,6 +192,16 @@ export class ThreeTierStack extends cdk.Stack {
 
     // 1. AWS WAF (Web Application Firewall) - Regional WebACL for ALB
     const wafv2 = cdk.aws_wafv2;
+
+    // メンテナンス用IPセット
+    const maintenanceIpSet = new wafv2.CfnIPSet(this, "MaintenanceIpSet", {
+      addresses: ["203.0.113.0/24"], // 管理者IP（ダミー）
+      ipAddressVersion: "IPV4",
+      scope: "REGIONAL",
+      description: "IP set allowed during maintenance mode",
+      name: `MaintenanceIpSet-${envName}`,
+    });
+
     const webAcl = new wafv2.CfnWebACL(this, "AlbWebAcl", {
       defaultAction: { allow: {} },
       scope: "REGIONAL",
@@ -200,10 +210,56 @@ export class ThreeTierStack extends cdk.Stack {
         metricName: "AlbWebAcl",
         sampledRequestsEnabled: true,
       },
+      customResponseBodies: {
+        MaintenanceHtml: {
+          contentType: "TEXT_HTML",
+          content: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>メンテナンス中 - Service Temporarily Unavailable</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; padding: 150px 20px; background-color: #f8fafc; color: #334155; }
+    h1 { font-size: 40px; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    p { font-size: 18px; color: #64748b; line-height: 1.6; }
+    .icon { font-size: 64px; margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+  <div class="icon">🛠️</div>
+  <h1>ただいまメンテナンス中です</h1>
+  <p>サービス向上に向けたメンテナンスを実施しております。<br>ご不便をおかけいたしますが、しばらく経ってから再度アクセスしてください。</p>
+</body>
+</html>
+          `.trim(),
+        },
+      },
       rules: [
         {
-          name: "AWSManagedRulesCommonRuleSet",
+          name: "MaintenanceModeRule",
           priority: 1,
+          statement: {
+            notStatement: {
+              statement: {
+                ipSetReferenceStatement: {
+                  arn: maintenanceIpSet.attrArn,
+                },
+              },
+            },
+          },
+          // 初期状態は COUNT（通常稼働。ルールにマッチしてもブロックせずスルー）
+          // メンテナンス時は CLI から BLOCK に変更する
+          action: { count: {} },
+          visibilityConfig: {
+            cloudWatchMetricsEnabled: true,
+            metricName: "MaintenanceModeRule",
+            sampledRequestsEnabled: true,
+          },
+        },
+        {
+          name: "AWSManagedRulesCommonRuleSet",
+          priority: 2,
           statement: {
             managedRuleGroupStatement: {
               vendorName: "AWS",
