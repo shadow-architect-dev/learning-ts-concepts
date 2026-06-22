@@ -97,30 +97,49 @@ aws wafv2 update-web-acl \
 
 ---
 
-## 4. メンテナンス除外IP（管理者IP）の追加・更新手順
+## 4. メンテナンス除外IP（管理者IP）の追加・更新・削除手順
 
-メンテナンス中であっても、作業中の開発メンバーや動作検証用の端末からのみアクセスを許可するために、IPセット（`MaintenanceIpSet`）にIPを追加・更新する手順です。
+メンテナンス中であっても、作業中の開発メンバーや動作検証用の端末からのみアクセスを許可するために、IPセット（`MaintenanceIpSet`）にIPを追加・更新・削除する手順です。
 
-IPセットの更新は、WebACL全体の更新よりもはるかに簡単に行えます。
+> [!IMPORTANT]
+> AWS WAFv2 の `update-ip-set` コマンドは差分更新ではなく、**指定したIPリストによる「完全上書き」**となります。そのため、IPを追加または削除する際は、現在登録されているIPリストを正しく把握した上で実行する必要があります。
 
-### Step 1: 現在の IPSet 設定の取得
-更新に必要な `LockToken` と `Id` を取得します。
+### Step 1: 現在の IPSet 設定（登録されているIPリスト）の取得
+更新に必要な `LockToken`、`Id`、および現在登録されているIPリストを取得します。
 ```bash
 aws wafv2 get-ip-set \
   --name MaintenanceIpSet-prod \
   --scope REGIONAL \
   --query "{IPSet: IPSet, LockToken: LockToken}" \
   > temp-ip-set.json
+
+# 現在登録されている IP アドレスの一覧を表示して確認
+jq -r '.IPSet.Addresses[]' temp-ip-set.json
 ```
 
-### Step 2: IPアドレスの追加・更新
-取得した `LockToken` を使用して、接続を許可したい管理者IPのリスト（CIDR表記）を指定して IPSet を更新します。
-```bash
-aws wafv2 update-ip-set \
-  --name MaintenanceIpSet-prod \
-  --scope REGIONAL \
-  --id <IP_SET_ID> \
-  --addresses "203.0.113.10/32" "198.51.100.0/24" \
-  --lock-token "$(jq -r '.LockToken' temp-ip-set.json)"
-```
-* **反映時間**: コマンド実行から数秒で反映されます。これにより、登録されたIPからのアクセスのみメンテナンス画面をバイパスして、本番のアプリケーション（ECS/RDS）へ到達できるようになります。
+### Step 2: IPアドレスの更新（追加・削除）の実行
+取得した `LockToken` を使用し、**残したい（接続を許可し続けたい）IPアドレスのみ**を `--addresses` に指定して `update-ip-set` コマンドを実行します。
+
+* **IPを追加したい場合**:
+  現在登録されているIPリストに、新しく許可したいIPを加えたリストを指定します。
+  ```bash
+  aws wafv2 update-ip-set \
+    --name MaintenanceIpSet-prod \
+    --scope REGIONAL \
+    --id <IP_SET_ID> \
+    --addresses "203.0.113.10/32" "198.51.100.0/24" "新しく追加したいIP/32" \
+    --lock-token "$(jq -r '.LockToken' temp-ip-set.json)"
+  ```
+
+* **IPを削除したい場合 (退職や作業完了に伴うIP除外)**:
+  `temp-ip-set.json` から確認した現在登録されているIPリストから、**削除したい不要なIPを除外したリスト**を指定して実行します（指定しなかったIPは自動的に削除されます）。
+  ```bash
+  aws wafv2 update-ip-set \
+    --name MaintenanceIpSet-prod \
+    --scope REGIONAL \
+    --id <IP_SET_ID> \
+    --addresses "不要IPを除外した残りのIP/32" \
+    --lock-token "$(jq -r '.LockToken' temp-ip-set.json)"
+  ```
+
+* **反映時間**: コマンド実行から数秒で反映されます。
