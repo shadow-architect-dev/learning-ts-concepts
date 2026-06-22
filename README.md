@@ -152,7 +152,7 @@ graph TD
   - `sre/` - **SRE 信頼性基準 ＆ SLO/SLI 設計定義**
     - [slo-sli.md](file:///c:/Git/learning-ts-concepts/docs/sre/slo-sli.md) - SLO/SLI 策定定義書テンプレート
     - [template.md](file:///c:/Git/learning-ts-concepts/docs/sre/reports/template.md) - **SLO/SLI 月次運用報告書テンプレート**
-    - [post-mortem-sample.md](file:///c:/Git/learning-ts-concepts/docs/sre/post-mortem-sample.md) - **障害振り返り報告書 (Blameless Post-Mortem) サンプル**
+    - [post-mortem-sample.md](file:///c:/Git/learning-ts-concepts/docs/sre/post-mortems/post-mortem-sample.md) - **障害振り返り報告書 (Blameless Post-Mortem) サンプル**
     - [disaster-recovery-policy.md](file:///c:/Git/learning-ts-concepts/docs/sre/disaster-recovery-policy.md) - **災害復旧 (DR) 方針書**
     - [load-testing-plan.md](file:///c:/Git/learning-ts-concepts/docs/sre/load-testing-plan.md) - **負荷テスト ＆ キャパシティプランニング計画書**
     - [chaos-engineering.md](file:///c:/Git/learning-ts-concepts/docs/sre/chaos-engineering.md) - **カオスエンジニアリング実験計画書**
