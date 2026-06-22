@@ -160,6 +160,7 @@ graph TD
     - [troubleshooting-latency.md](file:///c:/Git/learning-ts-concepts/docs/runbook/troubleshooting-latency.md) - API遅延発生時の一次対応手順
     - [troubleshooting-cloudfront.md](file:///c:/Git/learning-ts-concepts/docs/runbook/troubleshooting-cloudfront.md) - 静的アセット配信エラー時の一次対応手順
     - [troubleshooting-disaster-recovery.md](file:///c:/Git/learning-ts-concepts/docs/runbook/troubleshooting-disaster-recovery.md) - **大規模災害（東京リージョン全滅）時の大阪復旧手順**
+    - [application-deployment.md](file:///c:/Git/learning-ts-concepts/docs/runbook/application-deployment.md) - **アプリケーションデプロイ手順書（★エンジニア向け）**
   - `governance/` - **マルチアカウント ＆ エンタープライズガバナンス設計方針書**
     - [multi-account-design.md](file:///c:/Git/learning-ts-concepts/docs/governance/multi-account-design.md) - マルチアカウント設計方針
     - [security-and-audit.md](file:///c:/Git/learning-ts-concepts/docs/governance/security-and-audit.md) - 監査・セキュリティ基準

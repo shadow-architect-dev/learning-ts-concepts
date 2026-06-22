@@ -369,3 +369,11 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 #### 2. [stack.test.ts (CDKアサーションテストの追加)](file:///c:/Git/learning-ts-concepts/infra/test/stack.test.ts)
 - `AppContainer` の `ReadonlyRootFilesystem` が `true` に設定されていること、`/tmp` に対するマウントポイント設定、および `tmp-volume` ボリュームの存在をアサーション検証するテストコードを追加。
 
+---
+
+## 17. アプリケーションデプロイ手順書（ランブック）の新規作成
+
+### 追加内容
+
+#### 1. [application-deployment.md](file:///c:/Git/learning-ts-concepts/docs/runbook/application-deployment.md)
+- アプリケーションエンジニア向けに、動的コンテナアプリ（ECS Fargate）と静的アセット（S3 + CloudFront）のそれぞれのデプロイ手順（手動コマンド、必要な権限、GitHub ActionsによるCI/CD自動化定義例、および障害時の緊急ロールバック手順）を明文化した手順書を新規作成しました。
