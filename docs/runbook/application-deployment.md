@@ -92,10 +92,12 @@ npm run build
 ```
 
 ### Step 2: S3 アセットバケットへの同期
-ローカルのビルド成果物（静的ファイル）を S3 バケットの `assets/` パスに同期します。
+ローカルのビルド成果物（静的ファイル）を S3 バケットの `assets/` パスに同期します。バケット名は、`docs/governance/shared-outputs.md` に記載されている対象環境の **AWS Account ID** を組み込んで決定します（命名規則: `static-assets-<ENV_NAME>-<AWS_ACCOUNT_ID>`）。
+
 ```powershell
 # 同期コマンド（不要になった古いファイルを削除する --delete オプション付き）
-aws s3 sync ./app/dist/assets s3://app-static-assets-dev/assets/ --delete
+# 例（開発環境でアカウントIDが555555555555の場合）: aws s3 sync ./app/dist/assets s3://static-assets-dev-555555555555/assets/ --delete
+aws s3 sync ./app/dist/assets s3://static-assets-<ENV_NAME>-<AWS_ACCOUNT_ID>/assets/ --delete
 ```
 
 ### Step 3: CloudFront のキャッシュクリア (Invalidation)
@@ -197,6 +199,6 @@ npx cdk deploy ThreeTierStack-dev -c imageTag=<PREVIOUS_STABLE_TAG> --require-ap
 
 # 2. 静的アセットを旧状態に戻す場合は、Gitで直前コミットにチェックアウトし、S3を同期し直してCloudFrontキャッシュをクリアします
 git checkout HEAD~1
-aws s3 sync ./app/dist/assets s3://app-static-assets-dev/assets/ --delete
+aws s3 sync ./app/dist/assets s3://static-assets-<ENV_NAME>-<AWS_ACCOUNT_ID>/assets/ --delete
 aws cloudfront create-invalidation --distribution-id <CLOUDFRONT_DISTRIBUTION_ID> --paths "/assets/*"
 ```
