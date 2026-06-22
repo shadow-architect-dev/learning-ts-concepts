@@ -20,7 +20,7 @@
 
 ### 📊 アーキテクチャ図
 
-![Architecture](./diagrams/architecture_v6.svg)
+![Architecture](./diagrams/architecture_v7.svg)
 
 #### 📝 ログ配信フロー (Log Pipeline Diagram)
 
@@ -146,7 +146,7 @@ graph TD
   - `lib/datadog-stack.ts` - Datadogスタック定義（S3/DynamoDBリモートステート対応）
   - `lib/monitors/` - 各AWSリソース（ECS/RDS）のDatadogモニター（アラート）および **SLO（サービスレベル目標）定義**
 - `diagrams/` - 構成図（Architecture Diagram）の格納
-  - `architecture_v6.svg` - **アーキテクチャ図**
+  - `architecture_v7.svg` - **アーキテクチャ図**
 - `docs/` - 運用ドキュメント・ウォークスルーの格納
   - `walkthrough.md` - **設計・実装履歴ウォークスルー**
   - `sre/` - **SRE 信頼性基準 ＆ SLO/SLI 設計定義**

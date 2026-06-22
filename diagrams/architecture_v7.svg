@@ -122,7 +122,7 @@
       </g>
 
       <!-- S3 Gateway Endpoint on VPC Border -->
-      <g transform="translate(732, 545)" filter="url(#shadow)">
+      <g transform="translate(742, 545)" filter="url(#shadow)">
         <circle cx="18" cy="18" r="18" fill="#15803d" />
         <path d="M 10 18 L 26 18 M 20 12 L 26 18 L 20 24" stroke="#ffffff" stroke-width="2" stroke-linecap="round" fill="none" />
         <text x="18" y="-12" font-size="9" font-weight="700" fill="#166534" text-anchor="middle">S3 Endpoint</text>
@@ -455,7 +455,7 @@
     </g>
 
     <!-- ==================== AWS REGION SERVICES (Amazon S3) ==================== -->
-    <g transform="translate(1120, 590)" filter="url(#shadow)">
+    <g transform="translate(1130, 590)" filter="url(#shadow)">
       <rect width="270" height="110" class="card" style="stroke: #15803d; stroke-width: 1.5;" />
       <circle cx="28" cy="45" r="14" fill="#15803d" opacity="0.15" />
       <path d="M 20 38 L 36 38 L 36 54 A 8 8 0 0 1 20 54 Z" fill="none" stroke="#15803d" stroke-width="2" />
@@ -491,8 +491,8 @@
     <text x="1090" y="338" text-anchor="end" font-size="9" font-weight="700" fill="#be123c">8. Cache Access</text>
 
     <!-- 9. ECS Tasks to S3 via S3 Gateway Endpoint -->
-    <path d="M 1040 450 L 1040 475 L 1065 475 L 1065 625 L 1072 625" class="flow-line-dash" stroke="#15803d" stroke-width="1.5" stroke-dasharray="3 3" fill="none" />
-    <path d="M 1090 625 L 1120 625" class="flow-line-green" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-green)" />
+    <path d="M 1040 450 L 1040 475 L 1080 475 L 1080 625 L 1082 625" class="flow-line-dash" stroke="#15803d" stroke-width="1.5" stroke-dasharray="3 3" fill="none" />
+    <path d="M 1118 625 L 1130 625" class="flow-line-green" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-green)" />
     <text x="1065" y="525" text-anchor="end" font-size="9" fill="#15803d" font-weight="700">9. S3 Access (Private)</text>
   </g>
 </svg>
