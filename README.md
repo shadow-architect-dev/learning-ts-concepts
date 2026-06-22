@@ -151,6 +151,7 @@ graph TD
   - `walkthrough.md` - **設計・実装履歴ウォークスルー**
   - `sre/` - **SRE 信頼性基準 ＆ SLO/SLI 設計定義**
     - [slo-sli.md](file:///c:/Git/learning-ts-concepts/docs/sre/slo-sli.md) - SLO/SLI 策定定義書テンプレート
+    - [template.md](file:///c:/Git/learning-ts-concepts/docs/sre/reports/template.md) - **SLO/SLI 月次運用報告書テンプレート**
     - [post-mortem-sample.md](file:///c:/Git/learning-ts-concepts/docs/sre/post-mortem-sample.md) - **障害振り返り報告書 (Blameless Post-Mortem) サンプル**
     - [disaster-recovery-policy.md](file:///c:/Git/learning-ts-concepts/docs/sre/disaster-recovery-policy.md) - **災害復旧 (DR) 方針書**
     - [load-testing-plan.md](file:///c:/Git/learning-ts-concepts/docs/sre/load-testing-plan.md) - **負荷テスト ＆ キャパシティプランニング計画書**
@@ -162,6 +163,7 @@ graph TD
     - [troubleshooting-disaster-recovery.md](file:///c:/Git/learning-ts-concepts/docs/runbook/troubleshooting-disaster-recovery.md) - **大規模災害（東京リージョン全滅）時の大阪復旧手順**
     - [application-deployment.md](file:///c:/Git/learning-ts-concepts/docs/runbook/application-deployment.md) - **アプリケーションデプロイ手順書（★エンジニア向け）**
     - [maintenance-mode.md](file:///c:/Git/learning-ts-concepts/docs/runbook/maintenance-mode.md) - **メンテナンスモード切り替え手順書（★SRE・運用向け）**
+    - [slo-reporting-guide.md](file:///c:/Git/learning-ts-concepts/docs/runbook/slo-reporting-guide.md) - **SLO/SLI 運用および報告手順書（★SRE向け）**
   - `governance/` - **マルチアカウント ＆ エンタープライズガバナンス設計方針書**
     - [multi-account-design.md](file:///c:/Git/learning-ts-concepts/docs/governance/multi-account-design.md) - マルチアカウント設計方針
     - [security-and-audit.md](file:///c:/Git/learning-ts-concepts/docs/governance/security-and-audit.md) - 監査・セキュリティ基準

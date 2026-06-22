@@ -393,4 +393,16 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 - `CfnIPSet` の存在と、WAF WebACL の `Rules` / `CustomResponseBodies` の構成（`MaintenanceModeRule` の存在確認など）を検証するアサーションを追加しました。
 
 #### 3. [maintenance-mode.md](file:///c:/Git/learning-ts-concepts/docs/runbook/maintenance-mode.md)
-- インフラの再デプロイを伴わない、AWS CLI を用いた瞬時のメンテナンス切り替え（`Count` ➔ `Block` への変更適用）手順、復旧手順、および除外管理者IPの更新手順を定義したランブックを新規作成しました。
+- インフラの再デプロイを伴わない、AWS CLI を用いた瞬時のメンテナンス切り替え（`Count` ➔ `Block` への変更適用）手順、復旧手順、および除外管理者IPの更新・削除手順を定義したランブックを新規作成・改修しました。
+
+---
+
+## 19. SLO/SLI 運用手順書と月次報告書テンプレートの作成
+
+### 変更内容
+
+#### 1. [slo-reporting-guide.md (新規)](file:///c:/Git/learning-ts-concepts/docs/runbook/slo-reporting-guide.md)
+- SREの実務プロセスとして、Datadog SLO 機能を用いた可用性およびレイテンシの実績値の抽出方法、定例会議での報告フロー、ならびにエラーバジェットが枯渇した際の新機能リリース制限（リリースゲート）を規定する「エラーバジェットポリシー」を定義した運用手順書を新規作成しました。
+
+#### 2. [template.md (新規)](file:///c:/Git/learning-ts-concepts/docs/sre/reports/template.md)
+- 毎月の SLO 実績値やエラーバジェット消費イベントの分析、および次月のアクションプランを Docs as Code で記述して Git 履歴に蓄積するための月次報告書テンプレートを作成しました。
