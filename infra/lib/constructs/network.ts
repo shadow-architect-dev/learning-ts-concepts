@@ -6,6 +6,8 @@ const ec2 = cdk.aws_ec2;
 export interface VpcConstructProps {
   envName?: string;
   vpcCidr?: string;
+  ipamPoolId?: string;
+  tgwId?: string;
 }
 
 export class VpcConstruct extends Construct {
@@ -19,14 +21,20 @@ export class VpcConstruct extends Construct {
     super(scope, id);
 
     const vpcCidr = props?.vpcCidr ?? "10.0.0.0/16";
+    const ipamPoolId = props?.ipamPoolId;
 
-    // コンテキストから natGateways の数を取得（指定がない場合はデフォルト 1。コスト最適化のため 0 を指定可能にする）
+    // コンテキストから natGateways の数を取得（IPAM利用時は0台に強制）
     const natGatewaysContext = this.node.tryGetContext("natGateways");
-    const natGateways = natGatewaysContext !== undefined ? Number(natGatewaysContext) : 1;
+    const natGateways = ipamPoolId ? 0 : (natGatewaysContext !== undefined ? Number(natGatewaysContext) : 1);
 
     // 3層構造のVPC: Public (ALB) → Private (Fargate) → Isolated (DB)
     this.vpc = new ec2.Vpc(this, "Vpc", {
-      ipAddresses: ec2.IpAddresses.cidr(vpcCidr),
+      ipAddresses: ipamPoolId
+        ? ec2.IpAddresses.awsIpamAllocation({
+            ipv4IpamPoolId: ipamPoolId,
+            ipv4NetmaskLength: 16,
+          })
+        : ec2.IpAddresses.cidr(vpcCidr),
       maxAzs: 3,
       natGateways: natGateways,
       subnetConfiguration: [
@@ -52,6 +60,31 @@ export class VpcConstruct extends Construct {
         },
       },
     });
+
+    // Transit Gateway (TGW) Peering & Routing
+    if (props?.tgwId) {
+      // 1. TGW VPC Attachment の作成 (L1 Cfn Resource)
+      new ec2.CfnTransitGatewayAttachment(this, "TgwVpcAttachment", {
+        transitGatewayId: props.tgwId,
+        vpcId: this.vpc.vpcId,
+        // アタッチメントを配置するプライベートサブネットを指定
+        subnetIds: this.vpc.selectSubnets({ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }).subnetIds,
+        tags: [{
+          key: "Name",
+          value: `${cdk.Stack.of(this).stackName}-tgw-attachment`,
+        }],
+      });
+
+      // 2. プライベートサブネットのルートテーブルに 0.0.0.0/0 ➔ TGW のルートを追加
+      const privateSubnets = this.vpc.selectSubnets({ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS });
+      privateSubnets.subnets.forEach((subnet, index) => {
+        new ec2.CfnRoute(this, `RouteToTgw-${index}`, {
+          routeTableId: subnet.routeTable.routeTableId,
+          destinationCidrBlock: "0.0.0.0/0", // 集約アウトバウンド宛てデフォルトルート
+          transitGatewayId: props.tgwId!,
+        });
+      });
+    }
 
     // ALB用セキュリティグループ
     this.albSecurityGroup = new ec2.SecurityGroup(this, "AlbSecurityGroup", {

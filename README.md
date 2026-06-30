@@ -19,10 +19,24 @@
 - **データ層**: Amazon Aurora Serverless v2 (MySQL 互換)
 - **データ転送最適化**: **S3 ゲートウェイ VPC エンドポイント**による無料の閉域網接続
 - **マルチ環境対応**: `dev` / `stg` / `prod` の独立した 3 スタック構成
+- **組織基盤（Landing Zone）統合**: **AWS VPC IPAM** による動的CIDRアロケーションおよび **Transit Gateway (TGW)** 経由の集約アウトバウンド（Common Egress）通信
+
+### 🌐 AWS VPC IPAM ＆ Transit Gateway によるマルチアカウント閉域ネットワーク統合
+
+本プロジェクトは、共通基盤（`aws-landing-zone`）とシームレスに閉域統合されるマルチアカウント・ネットワークトポロジーを想定して設計されています。
+
+* **AWS VPC IPAM による動的IPアドレス管理**:
+  手動での VPC CIDR ハードコードを排除し、`IpAddresses.awsIpamAllocation` を用いて、Landing Zoneから共有された IPAM プールから `/16` のCIDRブロックを動的に切り出してVPCを構築します。これにより、組織内の他のシステム（EKS側など）との間でのIPアドレス衝突を自動的に防ぎます。
+* **Transit Gateway (TGW) 経由の集約アウトバウンド (Common Egress)**:
+  自VPCのNAT Gatewayを廃止（`natGateways: 0`）し、代わりに共有された TGW への VPC アタッチメント（`CfnTransitGatewayAttachment`）を配置。プライベートサブネットからのデフォルトルート（`0.0.0.0/0`）を TGW に向ける（`CfnRoute`）ことで、すべての外部通信を Shared Services アカウントの集約 NAT GW へ中継させ、起動コストを極小化しています。
 
 ### 📊 アーキテクチャ図
 
 ![Architecture](./diagrams/architecture_v7.svg)
+
+> [!NOTE]
+> **集約アウトバウンド（Common Egress）移行に伴う構成変更**:
+> 上記の図には自VPC内の「NAT Gateway」が描かれていますが、インフラコスト最適化（FinOps）およびセキュリティ統制の一元化のため、現在はVPC内の自前 NAT Gateway は完全に撤廃されています。すべてのインターネット向け送信通信（`0.0.0.0/0`）は、**Transit Gateway (TGW)** を経由して共通基盤である `Shared Services` アカウントの集約 NAT Gateway から安全に送出される構成となっています（CDKコード上はすでに反映済みです）。
 
 #### 📝 ログ配信フロー (Log Pipeline Diagram)
 
@@ -123,7 +137,7 @@ graph TD
 ### 💡 dev 環境におけるコスト削減の取り組み（FinOps）
 開発環境 (`dev`) では、検証・本番環境と同等のネットワークトポロジーを維持しつつ、以下の施策によって**本来約 4 万円/月かかるコストを約 1.6 万円/月（約 60% 削減）**まで抑え込んでいます。
 *   **夜間自動停止の適用**: EventBridge と Lambda を用い、夜間（20:00〜翌朝8:00）に ECS および Aurora Serverless v2 を自動停止させ、稼働時間を約 50% に削減。
-*   **NAT Gateway の完全排除**: 開発環境から NAT Gateway を排除し、VPC エンドポイント（PrivateLink）で代用することで、基本料金を削減。
+*   **NAT Gateway の完全排除（集約アウトバウンド移行）**: 開発環境 (`dev`) の VPC から自前 NAT Gateway を撤廃し、VPCエンドポイントを活用しつつ、外部通信は Transit Gateway 経由で Landing Zone の集約 NAT GW へ流すことで基本料金を完全に削減。
 *   **トポロジーのダウングレード**: Redis キャッシュをマルチAZクラスターからシングルノードに変更し、DB Proxy を非搭載にすることで不要なライセンス/稼働費用をカット。
 
 ### 📈 さらなるコスト削減の余地 (Savings Plans ＆ Reserved Instances)

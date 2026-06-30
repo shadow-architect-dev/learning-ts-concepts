@@ -63,6 +63,10 @@ export interface ThreeTierStackProps extends cdk.StackProps {
   domainName?: string;
   /** Optional custom VPC CIDR block */
   vpcCidr?: string;
+  /** AWS VPC IPAM Pool ID */
+  ipamPoolId?: string;
+  /** AWS Transit Gateway ID */
+  tgwId?: string;
   /** GitHub Organization or Username */
   githubOrg?: string;
   /** GitHub Repository name */
@@ -77,10 +81,17 @@ export class ThreeTierStack extends cdk.Stack {
     const dbCapacity = props?.dbCapacity;
     const envName = props?.envName;
     const vpcCidr = props?.vpcCidr;
+    const ipamPoolId = props?.ipamPoolId;
+    const tgwId = props?.tgwId;
     const githubOrg = props?.githubOrg ?? "shadow-architect-dev";
     const githubRepo = props?.githubRepo ?? "ecs-fargate-ci-cd-platform";
 
-    const vpcConstruct = new VpcConstruct(this, "VpcConstruct", { envName, vpcCidr });
+    const vpcConstruct = new VpcConstruct(this, "VpcConstruct", {
+      envName,
+      vpcCidr,
+      ipamPoolId,
+      tgwId,
+    });
 
     const kms = new KmsConstruct(this, "KmsConstruct", { envName });
 
