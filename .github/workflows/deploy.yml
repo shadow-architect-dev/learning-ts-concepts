@@ -25,26 +25,35 @@ jobs:
       # AWSアカウントIDやロールARNはSecretsから安全に取得します
       - name: Set Environment Variables
         run: |
-          echo "AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}" >> $GITHUB_ENV
           AWS_REGION="${{ secrets.AWS_REGION || 'ap-northeast-1' }}"
           echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
           
           if [ "${{ github.ref_name }}" = "main" ]; then
-            echo "ENV_NAME=prod" >> $GITHUB_ENV
-            echo "AWS_ROLE_ARN=${{ secrets.ROLE_ARN_PROD }}" >> $GITHUB_ENV
-            echo "ECR_REPO=app-repo-prod" >> $GITHUB_ENV
-            echo "CDK_STACK=ThreeTierStack-prod" >> $GITHUB_ENV
+            ENV_NAME="prod"
+            AWS_ROLE_ARN="${{ secrets.ROLE_ARN_PROD }}"
+            ECR_REPO="app-repo-prod"
+            CDK_STACK="ThreeTierStack-prod"
           elif [[ "${{ github.ref_name }}" =~ ^release/ ]]; then
-            echo "ENV_NAME=stg" >> $GITHUB_ENV
-            echo "AWS_ROLE_ARN=${{ secrets.ROLE_ARN_STG }}" >> $GITHUB_ENV
-            echo "ECR_REPO=app-repo-stg" >> $GITHUB_ENV
-            echo "CDK_STACK=ThreeTierStack-stg" >> $GITHUB_ENV
+            ENV_NAME="stg"
+            AWS_ROLE_ARN="${{ secrets.ROLE_ARN_STG }}"
+            ECR_REPO="app-repo-stg"
+            CDK_STACK="ThreeTierStack-stg"
           else
-            echo "ENV_NAME=dev" >> $GITHUB_ENV
-            echo "AWS_ROLE_ARN=${{ secrets.ROLE_ARN_DEV }}" >> $GITHUB_ENV
-            echo "ECR_REPO=app-repo-dev" >> $GITHUB_ENV
-            echo "CDK_STACK=ThreeTierStack-dev" >> $GITHUB_ENV
+            ENV_NAME="dev"
+            AWS_ROLE_ARN="${{ secrets.ROLE_ARN_DEV }}"
+            ECR_REPO="app-repo-dev"
+            CDK_STACK="ThreeTierStack-dev"
           fi
+
+          # Export variables to GITHUB_ENV
+          echo "ENV_NAME=$ENV_NAME" >> $GITHUB_ENV
+          echo "AWS_ROLE_ARN=$AWS_ROLE_ARN" >> $GITHUB_ENV
+          echo "ECR_REPO=$ECR_REPO" >> $GITHUB_ENV
+          echo "CDK_STACK=$CDK_STACK" >> $GITHUB_ENV
+
+          # Dynamically extract 12-digit AWS Account ID from OIDC Role ARN
+          AWS_ACCOUNT_ID=$(echo "$AWS_ROLE_ARN" | cut -d':' -f5)
+          echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID" >> $GITHUB_ENV
         shell: bash
 
       # 2.5. Dockerfile Linter (Hadolint)
