@@ -58,6 +58,11 @@ export class DatabaseConstruct extends Construct {
       storageEncryptionKey: props.kmsKey,
     });
 
+    // Resource Scheduler用タグの追加 (dev/stg環境のみ夜間自動停止)
+    if (props.envName === "dev" || props.envName === "stg") {
+      cdk.Tags.of(this.cluster).add("Schedule", "office-hours");
+    }
+
     // 本番（prod）およびステージング（stg）環境のみ RDS Proxy を有効化
     if (props.envName === "prod" || props.envName === "stg") {
       this.proxy = this.cluster.addProxy("DbProxy", {

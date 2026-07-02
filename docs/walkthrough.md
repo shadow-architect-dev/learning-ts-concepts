@@ -421,3 +421,15 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 
 ### 動作確認
 - `npm test` によるユニットテストがすべて正常にパス（PASS）することを確認。
+
+---
+
+## 21. Resource Scheduler（夜間自動停止・朝自動起動）用タグの適用
+
+### 変更内容
+
+#### 1. [database.ts (RDSインフラ定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/database.ts)
+- `dev` および `stg` 環境向けに、プラットフォーム共通の自動停止/起動システム（Resource Scheduler）と連動させるため、`DatabaseCluster` に `Schedule = office-hours` タグを付与するロジックを追加。
+
+### 動作確認
+- `npm test` によるユニットテストがすべて正常にパス（PASS）することを確認。
