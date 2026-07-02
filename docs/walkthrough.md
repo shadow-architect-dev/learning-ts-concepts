@@ -433,3 +433,15 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 
 ### 動作確認
 - `npm test` によるユニットテストがすべて正常にパス（PASS）することを確認。
+
+---
+
+## 22. 組織中央セキュリティガードレールへの適合修正
+
+### 変更内容
+
+#### 1. [compute.ts (ECSコンピューティング定義)](file:///c:/Git/learning-ts-concepts/infra/lib/constructs/compute.ts)
+- プラットフォームのセキュリティ監査（非Root実行の強制ポリシー）に適合するため、ECSタスク定義における `AppContainer` に対し `user: "nginx"`、`DatadogAgent` に対して `user: "datadog"` を明示的に指定。IaC定義レベルで非Rootユーザー実行を保証。
+
+### 動作確認
+- `npm test` によるユニットテストがすべて正常にパス（PASS）することを確認。

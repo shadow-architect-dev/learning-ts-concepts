@@ -149,6 +149,7 @@ export class ComputeConstruct extends Construct {
       },
       secrets: containerSecrets,
       readonlyRootFilesystem: true,
+      user: "nginx",
     });
 
     container.addMountPoints({
@@ -181,6 +182,7 @@ export class ComputeConstruct extends Construct {
       secrets: {
         DD_API_KEY: ecs.Secret.fromSecretsManager(ddApiKeySecret),
       },
+      user: "datadog",
     });
 
     ddAgentContainer.addPortMappings(
