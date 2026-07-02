@@ -185,25 +185,9 @@ test("ThreeTierStack Synthesizes Correctly", () => {
     })
   );
 
-  // Fargate の夜間自動停止用スケーリングターゲットとスケジュールが存在することを確認
-  template.hasResourceProperties("AWS::ApplicationAutoScaling::ScalableTarget", {
-    MinCapacity: 0,
-    MaxCapacity: 1,
-    ScheduledActions: Match.arrayWith([
-      Match.objectLike({
-        ScheduledActionName: "NightlyStopFargate",
-        Schedule: "cron(0 11 * * ? *)",
-      }),
-      Match.objectLike({
-        ScheduledActionName: "DailyStartFargate",
-        Schedule: "cron(0 23 * * ? *)",
-      }),
-    ]),
-  });
-
-  // Aurora の夜間自動停止用 Lambda と S3 オブジェクト自動削除用のカスタムリソース Lambda が存在することを確認
-  template.resourceCountIs("AWS::Lambda::Function", 2);
-  template.resourceCountIs("AWS::Events::Rule", 2);
+  // S3 オブジェクト自動削除用のカスタムリソース Lambda が存在することを確認
+  template.resourceCountIs("AWS::Lambda::Function", 1);
+  template.resourceCountIs("AWS::Events::Rule", 0);
 
   // dev環境では DBProxy が存在しないこと（追加コスト0）を確認
   template.resourceCountIs("AWS::RDS::DBProxy", 0);
