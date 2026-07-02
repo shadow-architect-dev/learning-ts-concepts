@@ -29,11 +29,11 @@ gantt
     section 業務時間内 (アクティブ)
     ECS 1台 & Aurora 稼働  :active, 08:00, 20:00
     section 夜間・休日 (一時停止)
-    ECS 0台 & Aurora 一時停止 :crit, 20:00, 08:00
+    ECS 1台 & Aurora 一時停止 :crit, 20:00, 08:00
 ```
 
 ### 1. 開発環境（`dev`）におけるコストの最小化
-- **リソースの自動停止**: 開発環境（`dev`）の ECS Fargate サービスおよび Aurora Serverless v2 クラスターは、夜間・休日（JST 20:00 〜 翌 08:00）に自動停止・スケールダウン（Min: 0）をスケジュール実行し、非アクティブ時間の利用料金を約60%削減します（本テンプレートにて Lambda ＆ EventBridge を用いて実装済み）。
+- **リソースの自動停止**: 開発（`dev`）および検証（`stg`）環境の Aurora Serverless v2 クラスターは、共通の Resource Scheduler（タグ `Schedule = office-hours` 連携）を用いて夜間・休日（JST 20:00 〜 翌 08:00）に自動停止され、非アクティブ時間のデータベース利用料金を削減します。
 - **Nat Gateway の削減**: `dev` 環境における外部通信は、Nat Gateway（固定費約 $32/月）を配置せず、パブリックIPの動的アタッチ等でコストをバイパス可能なオプションを用意します（CDKコンテキストパラメータ `natGateways=0` で制御可能）。
 
 ### 2. ステージング環境（`stg`）における適正サイズ化 (Rightsizing)
