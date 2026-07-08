@@ -61,5 +61,43 @@
 ## 4. AI エージェント（Antigravity）に対する外部スコープ書き込み制限
 
 - **他リポジトリへの書き込み・変更コマンドの禁止 (No Write/Modifying Operations on Outer Repositories)**:
-  - Antigravity は、`c:\Git\learning-ts-concepts` 以外のリポジトリやディレクトリ（`aws-landing-zone` や `learning-terraform-concepts` 等）のファイルに対して、新規作成・上書き・編集・削除を一切行ってはならず、読み取り専用（Read-Only）として振る舞うこと。
   - `learning-ts-concepts` 以外のディレクトリ内におけるファイル更新（`write_to_file` / `replace_file_content` などの実行）およびコマンド実行は、ポリシー違反であり、厳格に禁止する。
+
+---
+
+## 5. 共通 AWS Landing Zone 接続仕様 ＆ セキュリティガードレール
+
+このリポジトリのインフラを拡張・変更する際は、SREが構築したプラットフォームの接続仕様およびセキュリティガードレールに厳密に準拠すること。
+
+### ① Terraform 状態管理 (State Backend) の接続設定
+インフラのステート管理バケットや DynamoDB ロックテーブルは事前作成（払い出し）されています。インフラ自体の作成は行わず、`providers.tf` などのバックエンド定義に以下の設定を使用して接続してください。
+* **S3 Bucket**: `aws-landing-zone-<環境名>-tfstate-<AWSアカウントID>`
+* **DynamoDB Lock Table**: `terraform-state-lock`
+* **KMS Key**: `alias/terraform-state-key` (バケット暗号化用)
+* **接続スニペット例**:
+  ```hcl
+  terraform {
+    backend "s3" {
+      bucket         = "aws-landing-zone-dev-tfstate-888888888888" # ※各環境のバケット名に置換
+      key            = "workload/terraform.tfstate"
+      region         = "ap-northeast-1"
+      dynamodb_table = "terraform-state-lock"
+      encrypt        = true
+    }
+  }
+  ```
+
+### ② CI/CD デプロイ用 IAM ロールの使用
+GitHub Actions などの CI/CD からデプロイを行う際は、機密のアクセスキーを直接発行せず、プラットフォームから提供されている OIDC 連携用デプロイロールを引き受けて（AssumeRole）実行してください。
+* **使用するロール ARN**: `arn:aws:iam::<AWSアカウントID>:role/GitHubActionsEKSDeployRole`
+* **ブランチ制約 (注意)**: 本番環境（Prod）へのデプロイは、プラットフォーム側のセキュリティポリシーにより `main` ブランチからのリクエストのみ AssumeRole が許可されています。開発ブランチから本番アカウントへの接続を試みないでください。
+
+### ③ セキュリティガードレールへの準拠
+以下の基準に違反する IaC コードを書いた場合、デプロイ直後にシステムによってリソースが強制変更・削除されます。
+* **セキュリティグループのパブリック開放禁止 (自律修復対象)**:
+  * SSH（ポート22）や RDP（ポート3389）をインターネット全体（`0.0.0.0/0`）に開放するセキュリティグループを作成しないこと。作成された場合、SSM Automation により数秒でルールが強制削除されます。
+* **データベース/キャッシュの送信先制限**:
+  * データベース（RDS等）やキャッシュ（ElastiCache等）に紐付けるセキュリティグループのアウトバウンド（Egress）通信は、必要最小限の IP / セキュリティグループ ID に絞り、`0.0.0.0/0` への全送信許可を行わないこと。
+* **コンテナの Root 実行禁止**:
+  * ECS タスク定義や Kubernetes マニフェストにおいて、コンテナが Root（管理者）権限で起動される設定にしないこと。必ず非Rootユーザー（`user` や `securityContext`）を明示的に指定すること。
+
