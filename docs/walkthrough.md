@@ -445,3 +445,15 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 
 ### 動作確認
 - `npm test` によるユニットテストがすべて正常にパス（PASS）することを確認。
+
+---
+
+## 23. プラットフォーム開発指示（AWS Landing Zone ガードレールポリシー）の AI 開発ルールへの統合
+
+### 変更内容
+
+#### 1. [.agents/AGENTS.md (AI開発ルールブック)](file:///c:/Git/learning-ts-concepts/.agents/AGENTS.md)
+- SREプラットフォームチームから提供された「WORKLOAD_INSTRUCTIONS（共通 AWS Landing Zone 接続仕様 ＆ セキュリティガードレール）」の規則を `AGENTS.md` の第5章にインポート・マージ。State Backendの構成定義、デプロイ用 OIDC ロールの AssumeRole 制約、およびセキュリティグループ・コンテナ非Root実行などのガードレール要件を AI 側の厳格な自己規制として統合。
+
+### 動作確認
+- `npm test` によるユニットテストがすべて正常にパス（PASS）することを確認。
