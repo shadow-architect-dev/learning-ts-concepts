@@ -457,3 +457,15 @@ Generated Terraform code for the stacks: datadog-monitoring-dev
 
 ### 動作確認
 - `npm test` によるユニットテストがすべて正常にパス（PASS）することを確認。
+
+---
+
+## 24. 自律型デバッグ＆自己修復ループ動作規約の AI 開発ルールへの統合
+
+### 変更内容
+
+#### 1. [.agents/AGENTS.md (AI開発ルールブック)](file:///c:/Git/learning-ts-concepts/.agents/AGENTS.md)
+- プッシュ後の CI 監視義務、エラー検出時の自動修復 (Self-Healing) 手順、および完全にパイプラインが成功するまでタスク完了報告をしない完了基準を規定した「自己修復ループ動作規約」を `AGENTS.md` の第2章にインポート・マージ。
+
+### 動作確認
+- `npm test` によるユニットテストがすべて正常にパス（PASS）することを確認。
